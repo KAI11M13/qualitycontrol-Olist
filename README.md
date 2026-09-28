@@ -89,7 +89,5 @@ ppt/               PPT、讲稿与生成脚本        report/          Word 报�
 标注样本（200 条随机样本）和规则迭代期的 140 条分层样本，逐条判定都是借助大模型（Claude）阅读葡语原文完成的，不是人工逐条标注。每条样本都附了中文释义和判定结果（见 `outputs/qa/`），可以直接人工抽查。判定结果据实使用，不在任何材料里称作"人工复核"。
 
 ## 数据来源与声明
-
-- 数据：[Olist Brazilian E-Commerce Public Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)（CC BY-NC-SA 4.0），巴西电商平台脱敏真实订单；本仓库使用的是 GitHub 上的 gzip 镜像，行数与官方一致。
 - 外部参考数据（`data/external/`）取自公告、新闻转载和财报报道，数字引用前应核对原文。
 - 本项目是个人作品，不代表 Olist 或任何公司的观点。
