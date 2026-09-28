@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+~$*
+outputs/dashboard_artifact.html
+ppt/node_modules/
+report/node_modules/

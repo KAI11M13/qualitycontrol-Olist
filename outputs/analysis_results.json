@@ -1,0 +1,388 @@
+{
+  "overview": {
+    "orders": 99092.0,
+    "delivered": 96203.0,
+    "qc": 4510.0,
+    "qc_rate": 0.0469,
+    "bad_rate": 0.1463,
+    "avg_score": 4.0886,
+    "gmv": 13541712.78,
+    "sellers": 3060.0,
+    "customers": 95774.0
+  },
+  "period": {
+    "2017H1": {
+      "qc_rate": 0.0416,
+      "bad_rate": 0.1403,
+      "bad_quality_share": 0.2238,
+      "bad_fulfill_share": 0.2833,
+      "on_time_rate": 0.9613
+    },
+    "2017H2": {
+      "qc_rate": 0.0438,
+      "bad_rate": 0.1468,
+      "bad_quality_share": 0.2372,
+      "bad_fulfill_share": 0.2892,
+      "on_time_rate": 0.9351
+    },
+    "2018M1-8": {
+      "qc_rate": 0.05,
+      "bad_rate": 0.1476,
+      "bad_quality_share": 0.2716,
+      "bad_fulfill_share": 0.3291,
+      "on_time_rate": 0.9227
+    }
+  },
+  "bad_quality_share_2018M4_8": 0.34944,
+  "bad_rate_2018M3": 0.2279,
+  "bad_rate_2018M8": 0.1093,
+  "on_time_2018M3": 0.8104,
+  "bad_quality_share_by_quarter": {
+    "2017Q1": 0.2188,
+    "2017Q2": 0.2269,
+    "2017Q3": 0.2706,
+    "2017Q4": 0.22,
+    "2018Q1": 0.2031,
+    "2018Q2": 0.3435,
+    "2018Q3": 0.3521
+  },
+  "type_by_year": {
+    "2017": {
+      "missing": 0.017,
+      "defect": 0.0152,
+      "mismatch": 0.012,
+      "fake": 0.0012,
+      "package": 0.0013,
+      "qc": 0.0431
+    },
+    "2018M1-8": {
+      "missing": 0.019,
+      "defect": 0.0159,
+      "mismatch": 0.016,
+      "fake": 0.0022,
+      "package": 0.0012,
+      "qc": 0.05
+    }
+  },
+  "decomp_order_type": {
+    "rate_A": 0.043085,
+    "rate_B": 0.050003,
+    "mix_effect": -9.4e-05,
+    "within_effect": 0.007032,
+    "interaction": -2e-05
+  },
+  "decomp_category": {
+    "rate_A": 0.043085,
+    "rate_B": 0.050003,
+    "mix_effect": -6.9e-05,
+    "within_effect": 0.007412,
+    "interaction": -0.000425
+  },
+  "decomp_category_top": {
+    "3C数码": 0.00196,
+    "钟表礼品": 0.00192,
+    "家居家纺": 0.001638,
+    "母婴玩具": 0.001417
+  },
+  "multi_item": {
+    "order_share": 0.0998,
+    "qc_share": 0.3364,
+    "missing_share": 0.7374,
+    "multi_qc": 0.1579,
+    "single_qc": 0.0346,
+    "review_after_delivered": 0.9977
+  },
+  "order_type": {
+    "1 单件": {
+      "n": 86598,
+      "qc": 0.0346,
+      "missing": 0.0053,
+      "bad_rate": 0.1126,
+      "order_share": 0.900159
+    },
+    "2 同SKU多件": {
+      "n": 6417,
+      "qc": 0.1423,
+      "missing": 0.1183,
+      "bad_rate": 0.2322,
+      "order_share": 0.066703
+    },
+    "3 单商家多SKU": {
+      "n": 1916,
+      "qc": 0.1362,
+      "missing": 0.1133,
+      "bad_rate": 0.2489,
+      "order_share": 0.019916
+    },
+    "4 多商家": {
+      "n": 1272,
+      "qc": 0.2697,
+      "missing": 0.2437,
+      "bad_rate": 0.4714,
+      "order_share": 0.013222
+    }
+  },
+  "seller_tier": {
+    "正常": {
+      "sellers": 246,
+      "delivered": 22080.0,
+      "qc": 908.0,
+      "gmv": 2680907.61,
+      "qc_rate": 0.041123
+    },
+    "需关注": {
+      "sellers": 43,
+      "delivered": 4002.0,
+      "qc": 369.0,
+      "gmv": 502233.88,
+      "qc_rate": 0.092204
+    },
+    "高风险": {
+      "sellers": 10,
+      "delivered": 976.0,
+      "qc": 182.0,
+      "gmv": 191514.58,
+      "qc_rate": 0.186475
+    }
+  },
+  "seller_tier_share": {
+    "正常": {
+      "sellers": 0.822742,
+      "delivered": 0.816025,
+      "qc": 0.622344,
+      "gmv": 0.794424
+    },
+    "需关注": {
+      "sellers": 0.143813,
+      "delivered": 0.147905,
+      "qc": 0.252913,
+      "gmv": 0.148825
+    },
+    "高风险": {
+      "sellers": 0.033445,
+      "delivered": 0.036071,
+      "qc": 0.124743,
+      "gmv": 0.056751
+    }
+  },
+  "platform_qc_rate_seller_grain": 0.0533,
+  "seller_eligible": 299,
+  "seller_eligible_order_cover": 0.6794,
+  "pareto_top10pct_orders_qc_share": 0.254969,
+  "pareto_top10pct_orders_sellers": 24,
+  "category_top": [
+    {
+      "category_cn": "办公家具",
+      "delivered_cnt": 1245.0,
+      "qc_rate": 0.1076,
+      "defect_rate": 0.0442,
+      "mismatch_rate": 0.0217,
+      "missing_rate": 0.0578,
+      "qc_share": 0.0314
+    },
+    {
+      "category_cn": "家装建材",
+      "delivered_cnt": 472.0,
+      "qc_rate": 0.0826,
+      "defect_rate": 0.0254,
+      "mismatch_rate": 0.0148,
+      "missing_rate": 0.0445,
+      "qc_share": 0.0092
+    },
+    {
+      "category_cn": "未知品类",
+      "delivered_cnt": 1356.0,
+      "qc_rate": 0.0656,
+      "defect_rate": 0.0206,
+      "mismatch_rate": 0.014,
+      "missing_rate": 0.0214,
+      "qc_share": 0.0209
+    },
+    {
+      "category_cn": "居家舒适",
+      "delivered_cnt": 370.0,
+      "qc_rate": 0.0649,
+      "defect_rate": 0.0135,
+      "mismatch_rate": 0.0243,
+      "missing_rate": 0.0297,
+      "qc_share": 0.0056
+    },
+    {
+      "category_cn": "手机通讯",
+      "delivered_cnt": 4066.0,
+      "qc_rate": 0.0627,
+      "defect_rate": 0.0251,
+      "mismatch_rate": 0.0226,
+      "missing_rate": 0.0157,
+      "qc_share": 0.0598
+    },
+    {
+      "category_cn": "影音设备",
+      "delivered_cnt": 342.0,
+      "qc_rate": 0.0614,
+      "defect_rate": 0.038,
+      "mismatch_rate": 0.0205,
+      "missing_rate": 0.0088,
+      "qc_share": 0.0049
+    }
+  ],
+  "heavy": {
+    "1 <1kg": {
+      "n": 51132,
+      "qc": 0.034,
+      "missing": 0.004,
+      "defect": 0.0155
+    },
+    "2 1-5kg": {
+      "n": 24534,
+      "qc": 0.0316,
+      "missing": 0.0053,
+      "defect": 0.013
+    },
+    "3 5-15kg": {
+      "n": 9064,
+      "qc": 0.0399,
+      "missing": 0.0086,
+      "defect": 0.0197
+    },
+    "4 ≥15kg": {
+      "n": 1854,
+      "qc": 0.0626,
+      "missing": 0.0232,
+      "defect": 0.0275
+    }
+  },
+  "info": {
+    "0 信息缺失": {
+      "n": 1231,
+      "qc": 0.0536,
+      "mismatch": 0.0154,
+      "fake": 0.0138
+    },
+    "1 1张图": {
+      "n": 41462,
+      "qc": 0.0337,
+      "mismatch": 0.0145,
+      "fake": 0.0018
+    },
+    "2 2-3张": {
+      "n": 26893,
+      "qc": 0.0333,
+      "mismatch": 0.0139,
+      "fake": 0.0014
+    },
+    "3 4张+": {
+      "n": 17012,
+      "qc": 0.0372,
+      "mismatch": 0.0139,
+      "fake": 0.0014
+    }
+  },
+  "fake_top": [
+    {
+      "main_category_cn": "未知品类",
+      "n": 1356,
+      "fake": 20.0,
+      "fake_rate": 0.0147
+    },
+    {
+      "main_category_cn": "电脑配件",
+      "n": 6499,
+      "fake": 43.0,
+      "fake_rate": 0.0066
+    },
+    {
+      "main_category_cn": "影音设备",
+      "n": 342,
+      "fake": 2.0,
+      "fake_rate": 0.0058
+    },
+    {
+      "main_category_cn": "钟表礼品",
+      "n": 5472,
+      "fake": 29.0,
+      "fake_rate": 0.0053
+    },
+    {
+      "main_category_cn": "游戏主机",
+      "n": 1006,
+      "fake": 4.0,
+      "fake_rate": 0.004
+    },
+    {
+      "main_category_cn": "香水香氛",
+      "n": 3043,
+      "fake": 10.0,
+      "fake_rate": 0.0033
+    }
+  ],
+  "fake_platform": 0.0018,
+  "falsify": {
+    "tenure": {
+      "1 入驻<3个月": 0.0494,
+      "2 3-6个月": 0.05,
+      "3 6-12个月": 0.0515,
+      "4 12个月以上": 0.0538
+    },
+    "late": {
+      "0": {
+        "qc": 0.0481,
+        "defect": 0.016,
+        "package": 0.0012,
+        "bad_rate": 0.0925
+      },
+      "1": {
+        "qc": 0.0299,
+        "defect": 0.0101,
+        "package": 0.0011,
+        "bad_rate": 0.6242
+      }
+    },
+    "repurchase": {
+      "1 首单品质客诉": {
+        "customers": 2487,
+        "repurchase_rate": 0.039
+      },
+      "2 首单其他差评": {
+        "customers": 5240,
+        "repurchase_rate": 0.0389
+      },
+      "3 首单3-4星": {
+        "customers": 15261,
+        "repurchase_rate": 0.0368
+      },
+      "4 首单5星": {
+        "customers": 31804,
+        "repurchase_rate": 0.0429
+      }
+    }
+  },
+  "sizing": {
+    "baseline_rate": 0.050003,
+    "baseline_orders": 52777,
+    "steps": [
+      {
+        "code": "A",
+        "name": "多件订单出库复核 + 分包裹提醒",
+        "assumption": "多件订单的少件/漏发客诉减少 50%",
+        "delta_pp": 0.007181,
+        "rate_after": 0.042822
+      },
+      {
+        "code": "B",
+        "name": "高风险/需关注商家整改",
+        "assumption": "该类商家的品质客诉减少 30%",
+        "delta_pp": 0.003112,
+        "rate_after": 0.03971
+      },
+      {
+        "code": "C",
+        "name": "3C数码/钟表礼品 正品与描述专项",
+        "assumption": "两类目假货 + 货不对板客诉减少 30%",
+        "delta_pp": 0.001548,
+        "rate_after": 0.038162
+      }
+    ],
+    "target_rate": 0.038162
+  }
+}

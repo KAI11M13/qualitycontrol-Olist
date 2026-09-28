@@ -1,0 +1,9 @@
+﻿tag_code,tag_name,tag_group,priority
+defect,质量缺陷/功能故障,品质类,2
+delay,物流延迟,履约类,7
+fake,假货/非正品,品质类,1
+mismatch,货不对板/错发,品质类,3
+missing,少件/漏发/缺配件,品质类,4
+not_received,未收到货,履约类,6
+package,包装破损/简陋,品质类,5
+service,服务/售后响应,服务类,8

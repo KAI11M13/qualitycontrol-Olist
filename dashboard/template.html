@@ -1,0 +1,759 @@
+<title>品控经营看板</title>
+<meta name="description" content="基于 Olist 巴西电商公开数据搭建的品控日常经营看板：品质客诉率、问题类型、类目与订单结构、商家风险分层。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+:root {
+  --page: #f1f2ef;
+  --surface: #fcfcfb;
+  --surface-2: #f5f6f3;
+  --ink: #15171a;
+  --ink-2: #50545a;
+  --muted: #84877f;
+  --grid: #e3e4de;
+  --axis: #c4c5bd;
+  --border: rgba(21, 23, 26, 0.10);
+  --accent: #2a78d6;
+  --accent-soft: rgba(42, 120, 214, 0.10);
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --mark-muted: #c3c2b7;
+  --good: #0ca30c;
+  --good-text: #006300;
+  --warn: #fab219;
+  --warn-text: #8a5800;
+  --crit: #d03b3b;
+  --crit-text: #b42323;
+  --radius: 10px;
+  --font: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0e0f0e;
+    --surface: #1a1a19;
+    --surface-2: #222220;
+    --ink: #f4f4f1;
+    --ink-2: #c3c2b7;
+    --muted: #8d8c85;
+    --grid: #2c2c2a;
+    --axis: #3b3b38;
+    --border: rgba(255, 255, 255, 0.10);
+    --accent: #3987e5;
+    --accent-soft: rgba(57, 135, 229, 0.16);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --mark-muted: #4f4f4a;
+    --good-text: #2fbf2f;
+    --warn-text: #fab219;
+    --crit-text: #ef7a7a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0e0f0e;
+  --surface: #1a1a19;
+  --surface-2: #222220;
+  --ink: #f4f4f1;
+  --ink-2: #c3c2b7;
+  --muted: #8d8c85;
+  --grid: #2c2c2a;
+  --axis: #3b3b38;
+  --border: rgba(255, 255, 255, 0.10);
+  --accent: #3987e5;
+  --accent-soft: rgba(57, 135, 229, 0.16);
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --mark-muted: #4f4f4a;
+  --good-text: #2fbf2f;
+  --warn-text: #fab219;
+  --crit-text: #ef7a7a;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.wrap { max-width: 1280px; margin: 0 auto; padding-inline: 20px; }
+@media (max-width: 520px) { .wrap { padding-inline: 16px; } }
+
+/* ---------- 顶栏 ---------- */
+@media (max-width: 700px) { header.top { position: static !important; } }
+header.top {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 10;
+  background: var(--page);
+  border-bottom: 1px solid var(--border);
+}
+.top-row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 12px; padding-block: 14px 10px;
+}
+.brand h1 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.02em; text-wrap: balance; }
+.brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+.tabs { display: flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
+.tabs button {
+  font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--ink-2);
+  padding: 6px 14px; border-radius: 6px; cursor: pointer;
+}
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); font-weight: 500; box-shadow: 0 1px 2px var(--border); }
+.tabs button:focus-visible, .seg button:focus-visible, select:focus-visible, .btn:focus-visible, th button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+/* ---------- 筛选行 ---------- */
+.filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 16px; padding-block: 4px 12px; }
+.field { display: flex; flex-direction: column; gap: 3px; }
+.field label, .field .lbl { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+select, input[type="search"] {
+  font: inherit; font-size: 13px; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; min-width: 0;
+}
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.seg button { font: inherit; font-size: 13px; border: 0; background: transparent; color: var(--ink-2); padding: 5px 11px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--border); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.btn { white-space: nowrap; flex-shrink: 0; font: inherit; font-size: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--ink-2); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
+.btn:hover { color: var(--ink); }
+.scope-note { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+main { padding-block: 16px 40px; display: flex; flex-direction: column; gap: 16px; }
+
+/* ---------- KPI ---------- */
+.kpis { display: grid; grid-template-columns: 1.6fr repeat(4, 1fr); gap: 12px; }
+.kpis.four { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1100px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 560px) { .kpis, .kpis.four { grid-template-columns: repeat(2, 1fr); } }
+.kpi {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+}
+.kpi .label { font-size: 12px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 6px; align-items: center; }
+.kpi .value { font-size: 26px; font-weight: 700; line-height: 1.15; }
+.kpi.hero .value { font-size: 40px; }
+@media (max-width: 1100px) { .kpi.hero { grid-column: span 2; grid-row: span 2; } }
+@media (max-width: 560px) { .kpi.hero { grid-row: span 1; } }
+.kpi .delta { font-size: 12px; color: var(--ink-2); }
+.kpi .delta b { font-weight: 500; }
+.up-bad { color: var(--crit-text); }
+.down-good { color: var(--good-text); }
+.kpi .spark { height: 36px; width: 100%; }
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500;
+  border-radius: 999px; padding: 1px 8px; border: 1px solid var(--border); white-space: nowrap;
+}
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.good { color: var(--good-text); }
+.chip.warn { color: var(--warn-text); }
+.chip.crit { color: var(--crit-text); }
+.chip.neutral { color: var(--muted); }
+
+/* ---------- 卡片 & 网格 ---------- */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; min-width: 0; }
+.card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+.card-head h2 { margin: 0; font-size: 15px; font-weight: 700; }
+.card-head p { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+.chart { width: 100%; height: 300px; }
+.chart.tall { height: 360px; }
+.tablebox { overflow-x: auto; }
+.tablebox.scroll { max-height: 560px; overflow: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 7px 10px; text-align: right; border-bottom: 1px solid var(--grid); white-space: nowrap; font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child, th.l, td.l { text-align: left; }
+thead th { position: sticky; top: 0; background: var(--surface); color: var(--ink-2); font-weight: 500; font-size: 12px; }
+th button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+th button[data-dir]::after { content: attr(data-dir); color: var(--accent); margin-left: 3px; }
+tbody tr:hover { background: var(--surface-2); }
+.mono { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: 12px; }
+.bar-cell { display: inline-block; height: 6px; border-radius: 3px; background: var(--series-1); vertical-align: middle; margin-left: 6px; opacity: .8; }
+.hint { font-size: 12px; color: var(--muted); margin: 8px 0 0; }
+
+/* ---------- 口径页 ---------- */
+.rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 900px) { .rules { grid-template-columns: 1fr; } }
+.rule { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+.rule h3 { margin: 0 0 4px; font-size: 13px; }
+.rule p { margin: 0; font-size: 12.5px; color: var(--ink-2); }
+.metric-list { display: flex; flex-direction: column; gap: 8px; }
+.metric { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; display: grid; grid-template-columns: 200px 1fr 140px; gap: 12px; }
+@media (max-width: 760px) { .metric { grid-template-columns: 1fr; } }
+.metric .code { font-size: 11px; color: var(--muted); }
+.metric .name { font-weight: 700; }
+.metric .def { font-size: 13px; color: var(--ink-2); }
+.metric .formula { font-size: 12px; color: var(--ink); background: var(--surface-2); border-radius: 6px; padding: 3px 8px; display: inline-block; margin-top: 4px; }
+.metric .base { text-align: right; }
+.metric .base b { font-size: 18px; }
+.metric.pending { opacity: .7; }
+.muted { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="top-row">
+      <div class="brand">
+        <h1>品控经营看板</h1>
+        <p id="subtitle">Olist 巴西电商公开数据（脱敏真实订单） · 面试作品 · 口径冻结 v1.0</p>
+      </div>
+      <div class="tabs" role="tablist" aria-label="页面">
+        <button role="tab" id="tab-overview" aria-selected="true" data-tab="overview">经营总览</button>
+        <button role="tab" id="tab-seller" aria-selected="false" data-tab="seller">商家风险</button>
+        <button role="tab" id="tab-metric" aria-selected="false" data-tab="metric">指标口径</button>
+      </div>
+    </div>
+    <div class="filters" id="filters">
+      <div class="field"><label for="f-start">下单月 · 起</label><select id="f-start"></select></div>
+      <div class="field"><label for="f-end">下单月 · 止</label><select id="f-end"></select></div>
+      <div class="field"><span class="lbl">快捷</span>
+        <div class="seg" id="f-preset">
+          <button type="button" data-p="3">近3月</button><button type="button" data-p="6">近6月</button><button type="button" data-p="2018">2018年</button><button type="button" data-p="all">全部</button>
+        </div>
+      </div>
+      <div class="field"><label for="f-l1">一级类目</label><select id="f-l1"></select></div>
+      <div class="field"><span class="lbl">订单结构</span>
+        <div class="seg" id="f-otype">
+          <button type="button" data-o="全部" aria-pressed="true">全部</button><button type="button" data-o="单件" aria-pressed="false">单件</button><button type="button" data-o="多件" aria-pressed="false">多件</button>
+        </div>
+      </div>
+      <button type="button" class="btn" id="f-reset">重置</button>
+      <span class="scope-note" id="scope-note"></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- ======================= 经营总览 ======================= -->
+  <main id="page-overview">
+    <section class="kpis" id="kpis" aria-label="核心指标"></section>
+
+    <section class="grid2">
+      <div class="card">
+        <div class="card-head">
+          <div><h2>品质客诉率 · 月度趋势</h2><p>品质客诉签收单 ÷ 签收单；参考线：目标 4.0%、预警 5.5%；灰带 = 控制限（2017 基线 ±3σ），红点 = 越限</p></div>
+          <button class="btn" data-toggle="trend">表格</button>
+        </div>
+        <div class="chart" id="c-trend"></div>
+        <div class="tablebox" id="t-trend" hidden></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h2>问题类型 · 本期 vs 上期</h2><p id="type-sub">各类问题客诉单 ÷ 签收单（多标签，不可相加）</p></div>
+          <button class="btn" data-toggle="type">表格</button>
+        </div>
+        <div class="chart" id="c-type"></div>
+        <div class="tablebox" id="t-type" hidden></div>
+      </div>
+    </section>
+
+    <section class="grid2">
+      <div class="card">
+        <div class="card-head">
+          <div><h2>一级类目 · 品质客诉率</h2><p>点击柱子可筛选该类目；竖线为当前筛选下的平台值</p></div>
+          <button class="btn" data-toggle="l1">表格</button>
+        </div>
+        <div class="chart tall" id="c-l1"></div>
+        <div class="tablebox" id="t-l1" hidden></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h2>订单结构 · 品质客诉率</h2><p>多件订单的客诉几乎都来自少件/漏发</p></div>
+          <button class="btn" data-toggle="otype">表格</button>
+        </div>
+        <div class="chart tall" id="c-otype"></div>
+        <div class="tablebox" id="t-otype" hidden></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div><h2>品类明细</h2><p>签收 ≥ 30 单的品类；状态：达标 ≤ 4.0%，关注 4.0–5.5%，预警 &gt; 5.5%；点击表头排序</p></div>
+      </div>
+      <div class="tablebox scroll" id="t-cat"></div>
+    </section>
+  </main>
+
+  <!-- ======================= 商家风险 ======================= -->
+  <main id="page-seller" hidden>
+    <section class="kpis four" id="seller-kpis" aria-label="商家分层"></section>
+    <section class="grid2">
+      <div class="card">
+        <div class="card-head">
+          <div><h2>商家体量 × 平滑品质客诉率</h2><p>近 6 个月（2018-03 ~ 2018-08）签收 ≥ 30 单的商家；横线为平台值</p></div>
+          <button class="btn" data-toggle="scatter">表格</button>
+        </div>
+        <div class="chart tall" id="c-scatter"></div>
+        <div class="tablebox" id="t-scatter" hidden></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div><h2>怎么读这张表</h2><p>评分模型与分层规则</p></div></div>
+        <div style="font-size:13px;color:var(--ink-2);display:flex;flex-direction:column;gap:8px">
+          <p style="margin:0"><b style="color:var(--ink)">品质分（0-100）</b> = 品质客诉率 50% + 差评率 20% + 发货超时率 15% + 延迟签收率 15%。每一项按参评商家的分位数打分，越靠前得分越高。</p>
+          <p style="margin:0"><b style="color:var(--ink)">平滑客诉率</b> =（客诉单 + 50 × 平台客诉率）÷（签收单 + 50）。订单少的商家会被拉向平台均值，避免"10 单里 1 单客诉 = 10%"被误判。</p>
+          <p style="margin:0"><span class="chip crit">高风险</span> 平滑客诉率 ≥ 平台 2 倍，且客诉 ≥ 3 单 → 30 天内整改，复评不过则限流。</p>
+          <p style="margin:0"><span class="chip warn">需关注</span> 平滑客诉率 ≥ 平台 1.5 倍，或差评率 ≥ 平台 1.5 倍 → 周度跟踪。</p>
+          <p style="margin:0"><span class="chip good">正常</span> 其余参评商家。</p>
+          <p class="hint">商家页使用固定窗口，不受顶部时间/类目筛选影响。</p>
+        </div>
+      </div>
+    </section>
+    <section class="card">
+      <div class="card-head">
+        <div><h2>商家风险榜</h2><p>点击表头排序；可按风险等级筛选或搜索商家 ID</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div class="seg" id="s-level">
+            <button type="button" data-l="全部" aria-pressed="false">全部</button><button type="button" data-l="高风险" aria-pressed="true">高风险</button><button type="button" data-l="需关注" aria-pressed="false">需关注</button><button type="button" data-l="正常" aria-pressed="false">正常</button>
+          </div>
+          <input type="search" id="s-search" placeholder="搜索商家 ID" aria-label="搜索商家 ID">
+        </div>
+      </div>
+      <div class="tablebox" id="t-seller"></div>
+    </section>
+  </main>
+
+  <!-- ======================= 指标口径 ======================= -->
+  <main id="page-metric" hidden>
+    <section class="rules" id="rules"></section>
+    <section class="card">
+      <div class="card-head">
+        <div><h2>指标字典</h2><p>基准值 = 2018 年 1-8 月，由字典中的口径 SQL 实跑得到；灰色为公开数据缺失、待接入的指标</p></div>
+        <input type="search" id="m-search" placeholder="搜索指标" aria-label="搜索指标">
+      </div>
+      <div class="metric-list" id="metric-list"></div>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script>window.echarts || document.write('<script src="vendor/echarts.min.js"><\/script>');</script>
+<script>
+const DATA = /*__DATA__*/null;
+
+/* ============================== 数据层 ============================== */
+const COLS = DATA.cube.cols;
+const CI = Object.fromEntries(COLS.map((c, i) => [c, i]));
+const ROWS = DATA.cube.rows;
+const MONTHS = [...new Set(ROWS.map(r => r[CI.purchase_month]))].sort();
+const L1S = [...new Set(ROWS.map(r => r[CI.category_l1]))].filter(x => x !== '未知').sort((a, b) => a.localeCompare(b, 'zh'));
+const MEAS = COLS.filter(c => !['purchase_month', 'category_l1', 'category_cn', 'order_type'].includes(c));
+const MULTI = ['同SKU多件', '单商家多SKU', '多商家'];
+const OTYPES = ['单件', '同SKU多件', '单商家多SKU', '多商家'];
+const TYPES = [
+  ['qc_missing_cnt', '少件/漏发'], ['qc_defect_cnt', '质量缺陷'], ['qc_mismatch_cnt', '货不对板'],
+  ['qc_fake_cnt', '假货'], ['qc_package_cnt', '包装破损'],
+];
+const TARGET = 0.04, WARN = 0.055;
+
+const state = { start: MONTHS[MONTHS.length - 6], end: MONTHS[MONTHS.length - 1], l1: '全部', otype: '全部', tab: 'overview',
+  catSort: { key: 'qc', dir: -1 }, sellerSort: { key: 'quality_score', dir: 1 }, sellerLevel: '高风险', sellerQ: '', metricQ: '' };
+
+function zero() { const o = {}; MEAS.forEach(m => o[m] = 0); return o; }
+function add(acc, r) { MEAS.forEach(m => acc[m] += r[CI[m]]); return acc; }
+function inRange(m, s, e) { return m >= s && m <= e; }
+function passDims(r, opt = {}) {
+  const l1 = opt.l1 ?? state.l1, ot = opt.otype ?? state.otype;
+  if (l1 !== '全部' && r[CI.category_l1] !== l1) return false;
+  const t = r[CI.order_type];
+  if (ot === '单件' && t !== '单件') return false;
+  if (ot === '多件' && !MULTI.includes(t)) return false;
+  return true;
+}
+function sumWhere(fn) { const acc = zero(); ROWS.forEach(r => { if (fn(r)) add(acc, r); }); return acc; }
+function groupBy(fn, keyFn) {
+  const map = new Map();
+  ROWS.forEach(r => { if (!fn(r)) return; const k = keyFn(r); if (!map.has(k)) map.set(k, zero()); add(map.get(k), r); });
+  return map;
+}
+const div = (a, b) => (b > 0 ? a / b : null);
+function rates(s) {
+  return {
+    qc: div(s.qc_cnt, s.delivered_cnt), bad: div(s.bad_cnt, s.review_cnt), onTime: s.delivered_cnt ? 1 - s.late_cnt / s.delivered_cnt : null,
+    fake10k: s.delivered_cnt ? s.qc_fake_cnt / s.delivered_cnt * 1e4 : null, defect: div(s.qc_defect_cnt, s.delivered_cnt),
+    mismatch: div(s.qc_mismatch_cnt, s.delivered_cnt), missing: div(s.qc_missing_cnt, s.delivered_cnt),
+    delivered: s.delivered_cnt, gmv: s.gmv, orders: s.order_cnt, qcCnt: s.qc_cnt,
+  };
+}
+function prevRange() {
+  const i0 = MONTHS.indexOf(state.start), i1 = MONTHS.indexOf(state.end), n = i1 - i0 + 1;
+  if (i0 - n < 0) return null;
+  return [MONTHS[i0 - n], MONTHS[i0 - 1]];
+}
+const inSel = r => inRange(r[CI.purchase_month], state.start, state.end) && passDims(r);
+
+/* ============================== 格式化 ============================== */
+const pct = (v, d = 1) => v == null ? '—' : (v * 100).toFixed(d) + '%';
+const pp = v => v == null ? '—' : (v >= 0 ? '+' : '−') + Math.abs(v * 100).toFixed(2) + 'pp';
+const num = v => v == null ? '—' : Math.round(v).toLocaleString('zh-CN');
+const compact = v => v >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : v >= 1e4 ? (v / 1e3).toFixed(1) + 'K' : num(v);
+const mlabel = m => m.slice(2).replace('-', '.');
+function statusOf(q) { if (q == null) return ['neutral', '—']; return q <= TARGET ? ['good', '达标'] : q <= WARN ? ['warn', '关注'] : ['crit', '预警']; }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ============================== 主题 ============================== */
+function tok(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function theme() {
+  return { ink: tok('--ink'), ink2: tok('--ink-2'), muted: tok('--muted'), grid: tok('--grid'), axis: tok('--axis'),
+    s1: tok('--series-1'), s2: tok('--series-2'), mm: tok('--mark-muted'), surface: tok('--surface'),
+    good: tok('--good'), warn: tok('--warn'), crit: tok('--crit'), font: tok('--font') };
+}
+const charts = {};
+function chart(id) {
+  if (!charts[id]) charts[id] = echarts.init(document.getElementById(id), null, { renderer: 'svg' });
+  return charts[id];
+}
+function baseOpt(T) {
+  return {
+    textStyle: { fontFamily: T.font, color: T.ink2 },
+    grid: { left: 8, right: 24, top: 28, bottom: 8, containLabel: true },
+    tooltip: { backgroundColor: T.surface, borderColor: T.grid, textStyle: { color: T.ink, fontSize: 12 }, confine: true },
+    animationDuration: 300,
+  };
+}
+const axisCommon = T => ({
+  axisLine: { lineStyle: { color: T.axis } }, axisTick: { show: false },
+  axisLabel: { color: T.muted, fontSize: 11 }, splitLine: { lineStyle: { color: T.grid, width: 1 } },
+});
+function table(el, head, rows) {
+  document.getElementById(el).innerHTML = '<table><thead><tr>' + head.map((h, i) => `<th class="${i ? '' : 'l'}">${h}</th>`).join('') +
+    '</tr></thead><tbody>' + rows.map(r => '<tr>' + r.map((c, i) => `<td class="${i ? '' : 'l'}">${c}</td>`).join('') + '</tr>').join('') + '</tbody></table>';
+}
+
+/* ============================== KPI ============================== */
+function renderKpis(T) {
+  const cur = rates(sumWhere(inSel));
+  const pr = prevRange();
+  const prev = pr ? rates(sumWhere(r => inRange(r[CI.purchase_month], pr[0], pr[1]) && passDims(r))) : null;
+  const byM = groupBy(r => passDims(r) && inRange(r[CI.purchase_month], state.start, state.end), r => r[CI.purchase_month]);
+  const spark = MONTHS.filter(m => inRange(m, state.start, state.end)).map(m => rates(byM.get(m) || zero()).qc);
+  const [st, stl] = statusOf(cur.qc);
+  const dl = (k, goodIsDown, fmt) => {
+    if (!prev || cur[k] == null || prev[k] == null) return '<span class="muted">无可比上期</span>';
+    const d = cur[k] - prev[k];
+    const bad = goodIsDown ? d > 0 : d < 0;
+    const arrow = d > 0 ? '▲' : d < 0 ? '▼' : '■';
+    return `<b class="${d === 0 ? '' : bad ? 'up-bad' : 'down-good'}">${arrow} ${fmt(d)}</b> 较上期`;
+  };
+  const ppf = d => pp(d), relf = d => (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(1);
+  document.getElementById('kpis').innerHTML = `
+    <div class="kpi hero">
+      <div class="label"><span>品质客诉率 <span class="muted">· 北极星</span></span><span class="chip ${st}">${stl}</span></div>
+      <div class="value">${pct(cur.qc, 2)}</div>
+      <div class="delta">${dl('qc', true, ppf)} · 品质客诉 ${num(cur.qcCnt)} 单</div>
+      <div class="spark" id="c-spark"></div>
+    </div>
+    <div class="kpi"><div class="label">差评率</div><div class="value">${pct(cur.bad)}</div><div class="delta">${dl('bad', true, ppf)}</div></div>
+    <div class="kpi"><div class="label">准时签收率</div><div class="value">${pct(cur.onTime)}</div><div class="delta">${dl('onTime', false, ppf)}</div></div>
+    <div class="kpi"><div class="label">假货投诉 <span class="muted">每万单</span></div><div class="value">${cur.fake10k == null ? '—' : cur.fake10k.toFixed(1)}</div><div class="delta">${dl('fake10k', true, relf)}</div></div>
+    <div class="kpi"><div class="label">签收订单</div><div class="value">${compact(cur.delivered)}</div><div class="delta">GMV R$ ${compact(cur.gmv)}${prev ? `<br><span class="muted">上期 ${compact(prev.delivered)} 单 · R$ ${compact(prev.gmv)}</span>` : ''}</div></div>`;
+  if (charts['c-spark']) { charts['c-spark'].dispose(); delete charts['c-spark']; }   // 迷你图的容器随 KPI 重绘，需要重建实例
+  const c = chart('c-spark');
+  c.setOption({
+    grid: { left: 2, right: 6, top: 4, bottom: 2 }, xAxis: { type: 'category', show: false, data: spark.map((_, i) => i) },
+    yAxis: { type: 'value', show: false, scale: true },
+    series: [{ type: 'line', data: spark, showSymbol: false, lineStyle: { width: 2, color: T.s1 }, areaStyle: { color: T.s1, opacity: 0.10 },
+      markPoint: { symbol: 'circle', symbolSize: 8, itemStyle: { color: T.s1, borderColor: T.surface, borderWidth: 2 }, label: { show: false },
+        data: [{ coord: [spark.length - 1, spark[spark.length - 1]] }] } }],
+    animation: false,
+  }, true);
+}
+
+/* ============================== 图：趋势 ============================== */
+function renderTrend(T) {
+  const byM = groupBy(r => passDims(r), r => r[CI.purchase_month]);
+  const ms = MONTHS.filter(m => inRange(m, state.start, state.end));
+  const vals = ms.map(m => rates(byM.get(m) || zero()));
+  // p 控制图：以当前维度筛选下 2017 年的整体比率为中心线 p0，控制限 p0 ± 3·sqrt(p0(1-p0)/n)，n = 当月签收单
+  const base = zero();
+  byM.forEach((acc, m) => { if (m.startsWith('2017')) MEAS.forEach(k => base[k] += acc[k]); });
+  const p0 = div(base.qc_cnt, base.delivered_cnt);
+  const lim = vals.map(v => {
+    if (p0 == null || !v.delivered) return { ucl: null, lcl: null };
+    const h = 3 * Math.sqrt(p0 * (1 - p0) / v.delivered);
+    return { ucl: p0 + h, lcl: Math.max(0, p0 - h) };
+  });
+  const out = vals.map((v, i) => (v.qc != null && lim[i].ucl != null && v.qc > lim[i].ucl ? [i, v.qc] : null)).filter(Boolean);
+  const c = chart('c-trend');
+  c.setOption({
+    ...baseOpt(T),
+    tooltip: { ...baseOpt(T).tooltip, trigger: 'axis', axisPointer: { type: 'line', lineStyle: { color: T.axis } },
+      formatter: p => { const i = ms.map(mlabel).indexOf(p[0].axisValue), v = vals[i], l = lim[i];
+        return `<b>${ms[i]}</b><br>品质客诉率 ${pct(v.qc, 2)}<br>品质客诉 ${num(v.qcCnt)} / 签收 ${num(v.delivered)}` +
+          (l.ucl == null ? '' : `<br><span style="color:${T.muted}">控制限 ${pct(l.lcl, 2)} – ${pct(l.ucl, 2)}（中心线 ${pct(p0, 2)}）</span>`) +
+          (v.qc != null && l.ucl != null && v.qc > l.ucl ? `<br><b style="color:${T.crit}">越出上控制限</b>` : ''); } },
+    xAxis: { type: 'category', data: ms.map(mlabel), boundaryGap: false, ...axisCommon(T), splitLine: { show: false } },
+    yAxis: { type: 'value', ...axisCommon(T), axisLine: { show: false }, axisLabel: { color: T.muted, fontSize: 11, formatter: v => (v * 100).toFixed(0) + '%' },
+      min: 0, max: v => Math.max(0.07, Math.ceil(v.max * 100 + 1) / 100) },
+    series: [
+      { type: 'line', data: lim.map(l => l.lcl), stack: 'cl', symbol: 'none', lineStyle: { opacity: 0 }, silent: true, z: 1 },
+      { type: 'line', data: lim.map(l => (l.ucl == null ? null : l.ucl - l.lcl)), stack: 'cl', symbol: 'none', lineStyle: { opacity: 0 },
+        areaStyle: { color: T.mm, opacity: 0.35 }, silent: true, z: 1 },
+      { type: 'scatter', data: out, symbolSize: 10, itemStyle: { color: T.crit, borderColor: T.surface, borderWidth: 2 }, z: 5, silent: true },
+      {
+      type: 'line', data: vals.map(v => v.qc), lineStyle: { width: 2, color: T.s1 }, itemStyle: { color: T.s1, borderColor: T.surface, borderWidth: 2 },
+      symbol: 'circle', symbolSize: 8, showSymbol: ms.length <= 12, z: 3,
+      endLabel: { show: true, color: T.ink, fontSize: 11, formatter: p => pct(p.value, 1) },
+      markLine: { silent: true, symbol: 'none', lineStyle: { color: T.axis, type: 'solid', width: 1 },
+        label: { color: T.muted, fontSize: 10, position: 'insideStartTop' },
+        data: [{ yAxis: TARGET, label: { formatter: '目标 4.0%' } }, { yAxis: WARN, label: { formatter: '预警 5.5%' } }] },
+    }],
+    grid: { left: 8, right: 44, top: 20, bottom: 8, containLabel: true },
+  }, true);
+  table('t-trend', ['下单月', '签收单', '品质客诉单', '品质客诉率', '差评率', '准时签收率'],
+    ms.map((m, i) => [m, num(vals[i].delivered), num(vals[i].qcCnt), pct(vals[i].qc, 2), pct(vals[i].bad), pct(vals[i].onTime)]));
+}
+
+/* ============================== 图：问题类型 ============================== */
+function renderType(T) {
+  const cur = sumWhere(inSel);
+  const pr = prevRange();
+  const prev = pr ? sumWhere(r => inRange(r[CI.purchase_month], pr[0], pr[1]) && passDims(r)) : null;
+  document.getElementById('type-sub').textContent = pr ? `本期 ${state.start} ~ ${state.end}，上期 ${pr[0]} ~ ${pr[1]}；多标签，不可相加` : '当前范围之前没有等长的上期；多标签，不可相加';
+  const cv = TYPES.map(([k]) => div(cur[k], cur.delivered_cnt));
+  const pv = prev ? TYPES.map(([k]) => div(prev[k], prev.delivered_cnt)) : null;
+  const series = [];
+  if (pv) series.push({ name: '上期', type: 'bar', data: pv, barMaxWidth: 14, itemStyle: { color: T.mm, borderRadius: [0, 4, 4, 0] } });
+  series.push({ name: '本期', type: 'bar', data: cv, barMaxWidth: 14, itemStyle: { color: T.s1, borderRadius: [0, 4, 4, 0] },
+    label: { show: true, position: 'right', color: T.ink, fontSize: 11, formatter: p => pct(p.value, 2) } });
+  const c = chart('c-type');
+  c.setOption({
+    ...baseOpt(T),
+    legend: { top: 0, left: 0, itemWidth: 12, itemHeight: 8, textStyle: { color: T.ink2, fontSize: 12 }, data: pv ? ['本期', '上期'] : ['本期'] },
+    tooltip: { ...baseOpt(T).tooltip, trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(128,128,128,0.08)' } },
+      formatter: p => `<b>${p[0].name}</b><br>` + p.map(x => `${x.seriesName} ${pct(x.value, 2)}`).join('<br>') },
+    grid: { left: 8, right: 56, top: 30, bottom: 8, containLabel: true },
+    yAxis: { type: 'category', data: TYPES.map(t => t[1]), inverse: true, ...axisCommon(T), splitLine: { show: false }, axisLabel: { color: T.ink2, fontSize: 12 } },
+    xAxis: { type: 'value', ...axisCommon(T), axisLine: { show: false }, axisLabel: { color: T.muted, fontSize: 11, formatter: v => (v * 100).toFixed(1) + '%' } },
+    series,
+  }, true);
+  table('t-type', ['问题类型', '本期客诉单', '本期发生率', '上期发生率', '变化'],
+    TYPES.map(([k, n], i) => [n, num(cur[k]), pct(cv[i], 2), pv ? pct(pv[i], 2) : '—', pv && cv[i] != null && pv[i] != null ? pp(cv[i] - pv[i]) : '—']));
+}
+
+/* ============================== 图：一级类目 ============================== */
+function renderL1(T) {
+  const g = groupBy(r => inRange(r[CI.purchase_month], state.start, state.end) && passDims(r, { l1: '全部' }) && r[CI.category_l1] !== '未知', r => r[CI.category_l1]);
+  const all = rates(sumWhere(r => inRange(r[CI.purchase_month], state.start, state.end) && passDims(r, { l1: '全部' })));
+  const items = [...g.entries()].map(([k, s]) => ({ k, ...rates(s) })).filter(x => x.delivered >= 50).sort((a, b) => b.qc - a.qc);
+  const c = chart('c-l1');
+  c.setOption({
+    ...baseOpt(T),
+    tooltip: { ...baseOpt(T).tooltip, trigger: 'item', formatter: p => { const x = items[p.dataIndex]; return `<b>${x.k}</b><br>品质客诉率 ${pct(x.qc, 2)}<br>签收 ${num(x.delivered)} 单`; } },
+    grid: { left: 8, right: 52, top: 8, bottom: 8, containLabel: true },
+    yAxis: { type: 'category', data: items.map(x => x.k), inverse: true, ...axisCommon(T), splitLine: { show: false }, axisLabel: { color: T.ink2, fontSize: 12 } },
+    xAxis: { type: 'value', ...axisCommon(T), axisLine: { show: false }, axisLabel: { color: T.muted, fontSize: 11, formatter: v => (v * 100).toFixed(0) + '%' } },
+    series: [{
+      type: 'bar', barMaxWidth: 14, cursor: 'pointer',
+      data: items.map(x => ({ value: x.qc, itemStyle: { color: state.l1 === '全部' || state.l1 === x.k ? T.s1 : T.mm, borderRadius: [0, 4, 4, 0] } })),
+      label: { show: true, position: 'right', color: T.ink, fontSize: 11, formatter: p => pct(p.value, 1) },
+      markLine: { silent: true, symbol: 'none', lineStyle: { color: T.axis, width: 1, type: 'solid' }, label: { color: T.muted, fontSize: 10, formatter: '平台 ' + pct(all.qc, 1), position: 'insideEndTop' },
+        data: [{ xAxis: all.qc }] },
+    }],
+  }, true);
+  c.off('click');
+  c.on('click', p => { const k = items[p.dataIndex].k; state.l1 = state.l1 === k ? '全部' : k; syncFilters(); renderOverview(); });
+  table('t-l1', ['一级类目', '签收单', '品质客诉率', '少件/漏发', '质量缺陷', '货不对板', '差评率'],
+    items.map(x => [x.k, num(x.delivered), pct(x.qc, 2), pct(x.missing, 2), pct(x.defect, 2), pct(x.mismatch, 2), pct(x.bad)]));
+}
+
+/* ============================== 图：订单结构 ============================== */
+function renderOtype(T) {
+  const g = groupBy(r => inRange(r[CI.purchase_month], state.start, state.end) && passDims(r, { otype: '全部' }), r => r[CI.order_type]);
+  const items = OTYPES.map(k => ({ k, s: g.get(k) || zero() })).map(x => ({ k: x.k, ...rates(x.s), share: 0 }));
+  const tot = items.reduce((a, x) => a + (x.delivered || 0), 0);
+  items.forEach(x => x.share = tot ? x.delivered / tot : 0);
+  const miss = items.map(x => x.missing), rest = items.map(x => x.qc == null ? null : Math.max(0, x.qc - x.missing));
+  const dim = k => state.otype === '全部' || (state.otype === '单件' ? k === '单件' : k !== '单件');
+  const c = chart('c-otype');
+  c.setOption({
+    ...baseOpt(T),
+    legend: { top: 0, left: 0, itemWidth: 12, itemHeight: 8, textStyle: { color: T.ink2, fontSize: 12 } },
+    tooltip: { ...baseOpt(T).tooltip, trigger: 'axis', axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(128,128,128,0.08)' } },
+      formatter: p => { const x = items[p[0].dataIndex]; return `<b>${x.k}</b>（签收 ${num(x.delivered)} 单，占 ${pct(x.share)}）<br>品质客诉率 ${pct(x.qc, 2)}<br>其中少件/漏发 ${pct(x.missing, 2)}`; } },
+    grid: { left: 8, right: 64, top: 30, bottom: 8, containLabel: true },
+    yAxis: { type: 'category', data: OTYPES, inverse: true, ...axisCommon(T), splitLine: { show: false }, axisLabel: { color: T.ink2, fontSize: 12 } },
+    xAxis: { type: 'value', ...axisCommon(T), axisLine: { show: false }, axisLabel: { color: T.muted, fontSize: 11, formatter: v => (v * 100).toFixed(0) + '%' } },
+    series: [
+      { name: '少件/漏发', type: 'bar', stack: 'q', barMaxWidth: 18, data: miss.map((v, i) => ({ value: v, itemStyle: { color: dim(OTYPES[i]) ? T.s2 : T.mm } })),
+        itemStyle: { color: T.s2, borderColor: T.surface, borderWidth: 1 } },
+      { name: '其他品质问题', type: 'bar', stack: 'q', barMaxWidth: 18, data: rest.map((v, i) => ({ value: v, itemStyle: { color: dim(OTYPES[i]) ? T.s1 : T.mm, borderRadius: [0, 4, 4, 0] } })),
+        itemStyle: { color: T.s1, borderColor: T.surface, borderWidth: 1 },
+        label: { show: true, position: 'right', color: T.ink, fontSize: 11, formatter: p => pct(items[p.dataIndex].qc, 1) } },
+    ],
+  }, true);
+  table('t-otype', ['订单结构', '签收单', '占比', '品质客诉率', '少件/漏发率', '差评率'],
+    items.map(x => [x.k, num(x.delivered), pct(x.share), pct(x.qc, 2), pct(x.missing, 2), pct(x.bad)]));
+}
+
+/* ============================== 表：品类明细 ============================== */
+function renderCat() {
+  const g = groupBy(inSel, r => r[CI.category_cn] + '|' + r[CI.category_l1]);
+  const pr = prevRange();
+  const gp = pr ? groupBy(r => inRange(r[CI.purchase_month], pr[0], pr[1]) && passDims(r), r => r[CI.category_cn] + '|' + r[CI.category_l1]) : new Map();
+  let items = [...g.entries()].map(([k, s]) => {
+    const [cn, l1] = k.split('|'); const x = rates(s); const p = gp.get(k); const px = p ? rates(p) : null;
+    return { cn, l1, ...x, chg: px && px.qc != null && px.delivered >= 30 ? x.qc - px.qc : null };
+  }).filter(x => x.delivered >= 30 && x.cn !== '无商品明细');
+  const { key, dir } = state.catSort;
+  items.sort((a, b) => ((a[key] ?? -Infinity) > (b[key] ?? -Infinity) ? 1 : -1) * dir);
+  const maxq = Math.max(...items.map(x => x.qc || 0), 0.001);
+  const H = [['cn', '品类', 'l'], ['l1', '一级类目', 'l'], ['delivered', '签收单'], ['qc', '品质客诉率'], ['chg', '较上期'], ['missing', '少件/漏发'],
+    ['defect', '质量缺陷'], ['mismatch', '货不对板'], ['fake10k', '假货/万单'], ['bad', '差评率'], ['onTime', '准时签收率']];
+  const head = H.map(([k, n, c]) => `<th class="${c || ''}"><button data-sort="${k}" ${key === k ? `data-dir="${dir > 0 ? '↑' : '↓'}"` : ''}>${n}</button></th>`).join('') + '<th>状态</th>';
+  const body = items.map(x => {
+    const [st, stl] = statusOf(x.qc);
+    return `<tr><td class="l">${esc(x.cn)}</td><td class="l muted">${esc(x.l1)}</td><td>${num(x.delivered)}</td>
+      <td>${pct(x.qc, 2)}<span class="bar-cell" style="width:${Math.round((x.qc || 0) / maxq * 48)}px"></span></td>
+      <td class="${x.chg == null ? 'muted' : x.chg > 0 ? 'up-bad' : 'down-good'}">${x.chg == null ? '—' : pp(x.chg)}</td>
+      <td>${pct(x.missing, 2)}</td><td>${pct(x.defect, 2)}</td><td>${pct(x.mismatch, 2)}</td><td>${x.fake10k == null ? '—' : x.fake10k.toFixed(1)}</td>
+      <td>${pct(x.bad)}</td><td>${pct(x.onTime)}</td><td><span class="chip ${st}">${stl}</span></td></tr>`;
+  }).join('');
+  document.getElementById('t-cat').innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${body || '<tr><td class="l muted" colspan="12">当前筛选下没有签收 ≥ 30 单的品类</td></tr>'}</tbody></table>`;
+  document.querySelectorAll('#t-cat th button').forEach(b => b.onclick = () => {
+    const k = b.dataset.sort; state.catSort = { key: k, dir: state.catSort.key === k ? -state.catSort.dir : (['cn', 'l1'].includes(k) ? 1 : -1) }; renderCat();
+  });
+}
+
+/* ============================== 商家页 ============================== */
+const SELL = DATA.sellers;
+function renderSeller(T) {
+  const P = DATA.meta.seller_platform_qc_rate;
+  const lv = { '高风险': 'crit', '需关注': 'warn', '正常': 'good' };
+  const cnt = l => SELL.filter(s => s.risk_level === l);
+  const share = (arr, k) => arr.reduce((a, s) => a + s[k], 0) / SELL.reduce((a, s) => a + s[k], 0);
+  document.getElementById('seller-kpis').innerHTML = [
+    ['参评商家', `${SELL.length} 家`, `覆盖近 6 个月 ${pct(DATA.meta.seller_cover, 0)} 的签收单`, ''],
+    ...['高风险', '需关注', '正常'].map(l => [l, `${cnt(l).length} 家`, `签收占 ${pct(share(cnt(l), 'delivered_cnt'))} · 客诉占 ${pct(share(cnt(l), 'qc_cnt'))}`, lv[l]]),
+  ].map(([a, b, c, s]) => `<div class="kpi"><div class="label">${a}${s ? ` <span class="chip ${s}">${a}</span>` : ''}</div><div class="value">${b}</div><div class="delta">${c}</div></div>`).join('');
+
+  const colorOf = l => ({ '高风险': T.crit, '需关注': T.warn, '正常': T.mm }[l]);
+  const c = chart('c-scatter');
+  c.setOption({
+    ...baseOpt(T),
+    legend: { top: 0, left: 0, itemWidth: 10, itemHeight: 10, textStyle: { color: T.ink2, fontSize: 12 } },
+    tooltip: { ...baseOpt(T).tooltip, trigger: 'item', formatter: p => { const s = p.data.s; return `<b class="mono">${s.seller_id.slice(0, 8)}</b> · ${s.risk_level}<br>签收 ${num(s.delivered_cnt)} · 客诉 ${num(s.qc_cnt)}<br>客诉率 ${pct(s.qc_rate, 1)} · 平滑 ${pct(s.qc_rate_smooth, 1)}<br>品质分 ${s.quality_score}`; } },
+    grid: { left: 8, right: 24, top: 34, bottom: 24, containLabel: true },
+    xAxis: { type: 'log', name: '签收单（对数）', nameLocation: 'middle', nameGap: 26, nameTextStyle: { color: T.muted, fontSize: 11 }, ...axisCommon(T), min: 25 },
+    yAxis: { type: 'value', ...axisCommon(T), axisLine: { show: false }, axisLabel: { color: T.muted, fontSize: 11, formatter: v => (v * 100).toFixed(0) + '%' } },
+    series: ['正常', '需关注', '高风险'].map(l => ({
+      name: l, type: 'scatter', symbolSize: l === '正常' ? 8 : 10,
+      itemStyle: { color: colorOf(l), borderColor: T.surface, borderWidth: 2, opacity: l === '正常' ? 0.9 : 1 },
+      data: cnt(l).map(s => ({ value: [s.delivered_cnt, s.qc_rate_smooth], s })),
+      markLine: l === '正常' ? { silent: true, symbol: 'none', lineStyle: { color: T.axis, width: 1, type: 'solid' },
+        label: { color: T.muted, fontSize: 10, formatter: '平台 ' + pct(P, 1), position: 'insideEndTop' }, data: [{ yAxis: P }] } : undefined,
+    })),
+  }, true);
+  table('t-scatter', ['商家', '风险等级', '签收单', '平滑客诉率'],
+    [...SELL].sort((a, b) => b.qc_rate_smooth - a.qc_rate_smooth).slice(0, 40).map(s => [`<span class="mono">${s.seller_id.slice(0, 8)}</span>`, s.risk_level, num(s.delivered_cnt), pct(s.qc_rate_smooth, 2)]));
+  renderSellerTable();
+}
+function renderSellerTable() {
+  const lv = { '高风险': 'crit', '需关注': 'warn', '正常': 'good' };
+  let items = SELL.filter(s => (state.sellerLevel === '全部' || s.risk_level === state.sellerLevel) && s.seller_id.includes(state.sellerQ.trim().toLowerCase()));
+  const { key, dir } = state.sellerSort;
+  items.sort((a, b) => (a[key] > b[key] ? 1 : -1) * dir);
+  const H = [['seller_id', '商家 ID', 'l'], ['risk_level', '风险', 'l'], ['quality_score', '品质分'], ['score_rank', '排名'], ['delivered_cnt', '签收单'], ['qc_cnt', '品质客诉'],
+    ['qc_rate', '客诉率'], ['qc_rate_smooth', '平滑客诉率'], ['bad_rate', '差评率'], ['ship_overdue_rate', '发货超时率'], ['late_rate', '延迟签收率'], ['main_issue', '主要问题', 'l']];
+  const head = H.map(([k, n, c]) => `<th class="${c || ''}"><button data-sort="${k}" ${key === k ? `data-dir="${dir > 0 ? '↑' : '↓'}"` : ''}>${n}</button></th>`).join('');
+  const body = items.map(s => `<tr><td class="l mono" title="${s.seller_id}">${s.seller_id.slice(0, 8)}…</td><td class="l"><span class="chip ${lv[s.risk_level]}">${s.risk_level}</span></td>
+    <td><b>${s.quality_score.toFixed(1)}</b></td><td>${s.score_rank}</td><td>${num(s.delivered_cnt)}</td><td>${num(s.qc_cnt)}</td><td>${pct(s.qc_rate, 1)}</td><td>${pct(s.qc_rate_smooth, 1)}</td>
+    <td>${pct(s.bad_rate, 1)}</td><td>${pct(s.ship_overdue_rate, 1)}</td><td>${pct(s.late_rate, 1)}</td><td class="l">${esc(s.main_issue)}</td></tr>`).join('');
+  document.getElementById('t-seller').innerHTML = `<table><thead><tr>${head}</tr></thead><tbody>${body || '<tr><td class="l muted" colspan="12">没有匹配的商家</td></tr>'}</tbody></table>`;
+  document.querySelectorAll('#t-seller th button').forEach(b => b.onclick = () => {
+    const k = b.dataset.sort; state.sellerSort = { key: k, dir: state.sellerSort.key === k ? -state.sellerSort.dir : (['quality_score', 'score_rank', 'seller_id', 'risk_level', 'main_issue'].includes(k) ? 1 : -1) }; renderSellerTable();
+  });
+}
+
+/* ============================== 口径页 ============================== */
+function renderMetric() {
+  document.getElementById('rules').innerHTML = DATA.rules.map(([t, d]) => `<div class="rule"><h3>${esc(t)}</h3><p>${esc(d)}</p></div>`).join('');
+  const q = state.metricQ.trim();
+  const items = DATA.metrics.filter(m => !q || (m.code + m.name + m.definition + m.level).includes(q));
+  document.getElementById('metric-list').innerHTML = items.map(m => `
+    <div class="metric ${m.available === '已上线' ? '' : 'pending'}">
+      <div><div class="code">${m.code} · ${esc(m.level)}</div><div class="name">${esc(m.name)}</div><div class="code">${esc(m.available)}</div></div>
+      <div><div class="def">${esc(m.definition)}</div><div class="formula">${esc(m.formula)}</div></div>
+      <div class="base"><div class="code">基准值</div><b>${esc(m.baseline)}</b><div class="code">${esc(m.target)}</div></div>
+    </div>`).join('') || '<p class="muted">没有匹配的指标</p>';
+}
+
+/* ============================== 控件 ============================== */
+const $ = id => document.getElementById(id);
+function syncFilters() {
+  $('f-start').value = state.start; $('f-end').value = state.end; $('f-l1').value = state.l1;
+  document.querySelectorAll('#f-otype button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.o === state.otype)));
+  const n = MONTHS.indexOf(state.end) - MONTHS.indexOf(state.start) + 1;
+  document.querySelectorAll('#f-preset button').forEach(b => {
+    const p = b.dataset.p;
+    const on = (p === 'all' && state.start === MONTHS[0] && state.end === MONTHS.at(-1)) || (p === '2018' && state.start === '2018-01' && state.end === MONTHS.at(-1)) ||
+      ((p === '3' || p === '6') && state.end === MONTHS.at(-1) && n === +p);
+    b.setAttribute('aria-pressed', String(on));
+  });
+  const pr = prevRange();
+  $('scope-note').textContent = `本期 ${state.start} ~ ${state.end}（${n} 个月）` + (pr ? ` · 对比上期 ${pr[0]} ~ ${pr[1]}` : ' · 无可比上期');
+}
+function renderOverview() {
+  const T = theme();
+  renderKpis(T); renderTrend(T); renderType(T); renderL1(T); renderOtype(T); renderCat();
+}
+function renderAll() {
+  if (state.tab === 'overview') renderOverview();
+  if (state.tab === 'seller') renderSeller(theme());
+  if (state.tab === 'metric') renderMetric();
+}
+function setup() {
+  $('f-start').innerHTML = $('f-end').innerHTML = MONTHS.map(m => `<option value="${m}">${m}</option>`).join('');
+  $('f-l1').innerHTML = ['全部', ...L1S].map(x => `<option value="${x}">${x}</option>`).join('');
+  $('f-start').onchange = e => { state.start = e.target.value; if (state.start > state.end) state.end = state.start; syncFilters(); renderOverview(); };
+  $('f-end').onchange = e => { state.end = e.target.value; if (state.end < state.start) state.start = state.end; syncFilters(); renderOverview(); };
+  $('f-l1').onchange = e => { state.l1 = e.target.value; syncFilters(); renderOverview(); };
+  document.querySelectorAll('#f-otype button').forEach(b => b.onclick = () => { state.otype = b.dataset.o; syncFilters(); renderOverview(); });
+  document.querySelectorAll('#f-preset button').forEach(b => b.onclick = () => {
+    const p = b.dataset.p, last = MONTHS.length - 1;
+    state.end = MONTHS[last];
+    state.start = p === 'all' ? MONTHS[0] : p === '2018' ? '2018-01' : MONTHS[last - (+p) + 1];
+    syncFilters(); renderOverview();
+  });
+  $('f-reset').onclick = () => { Object.assign(state, { start: MONTHS[MONTHS.length - 6], end: MONTHS.at(-1), l1: '全部', otype: '全部' }); syncFilters(); renderOverview(); };
+  document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+  document.querySelectorAll('[data-toggle]').forEach(b => b.onclick = () => {
+    const k = b.dataset.toggle; const t = $('t-' + k), c = $('c-' + k);
+    const showTable = t.hidden; t.hidden = !showTable; c.hidden = showTable; b.textContent = showTable ? '图表' : '表格';
+    if (!showTable && charts['c-' + k]) charts['c-' + k].resize();
+  });
+  document.querySelectorAll('#s-level button').forEach(b => b.onclick = () => {
+    state.sellerLevel = b.dataset.l; document.querySelectorAll('#s-level button').forEach(x => x.setAttribute('aria-pressed', String(x === b))); renderSellerTable();
+  });
+  $('s-search').oninput = e => { state.sellerQ = e.target.value; renderSellerTable(); };
+  $('m-search').oninput = e => { state.metricQ = e.target.value; renderMetric(); };
+  window.addEventListener('resize', () => Object.values(charts).forEach(c => c.resize()));
+  const rerender = () => { Object.values(charts).forEach(c => c.dispose()); for (const k in charts) delete charts[k]; renderAll(); };
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', rerender);
+  new MutationObserver(rerender).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  $('subtitle').textContent = `Olist 巴西电商公开数据（脱敏真实订单） · ${MONTHS[0]} ~ ${MONTHS.at(-1)} · 更新于 ${DATA.meta.generated} · 口径 v1.0`;
+}
+function showTab(tab) {
+  state.tab = tab;
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+  ['overview', 'seller', 'metric'].forEach(t => $('page-' + t).hidden = t !== tab);
+  $('filters').hidden = tab !== 'overview';
+  try { localStorage.setItem('qc-tab', tab); } catch (e) { /* 存储不可用时忽略 */ }
+  renderAll();
+  Object.values(charts).forEach(c => c.resize());
+}
+setup();
+syncFilters();
+let initialTab = 'overview';
+const hash = (location.hash || '').slice(1);
+if (['overview', 'seller', 'metric'].includes(hash)) initialTab = hash;
+else { try { initialTab = localStorage.getItem('qc-tab') || 'overview'; } catch (e) { /* 忽略 */ } }
+showTab(initialTab);
+</script>
