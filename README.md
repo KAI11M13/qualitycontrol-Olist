@@ -23,11 +23,6 @@
 | ② 经营看板 | 3 页交互看板（经营总览 / 商家分层 / 指标口径）：第一屏有控制图和预警清单；Power BI、Tableau、SmartBI 搭建指南；Tableau Public 逐步搭建清单 | [dashboard/index.html](dashboard/index.html)（本地双击打开）· [搭建指南](docs/04_BI看板设计与搭建指南.md) · [Tableau Public 清单](docs/07_Tableau_Public搭建清单.md) · [BI 导入数据](dashboard/bi_data/) |
 | Excel 报表 | 商家品质月报模板：改参数页的月份和阈值，SUMIFS / INDEX-MATCH 公式自动重算商家分层，附数据透视表和条件格式；商家分层结果与数仓逐一核对 | [商家品质月报模板.xlsx](docs/商家品质月报模板.xlsx) |
 | ③ 专题分析 | 分析报告（Word + Markdown）、25 页完整版 PPT（21 页正文 + 4 页附录）与 6 页精简版；控制图、显著性检验、商家分层回测、三组情景、差异化抽检、品类结构重加权 | [报告.docx](report/品控专题分析报告.docx) · [报告.md](docs/03_专题分析报告.md) · [完整版 PPT](ppt/品控数据分析项目_面试汇报.pptx) · [精简版 PPT](ppt/品控数据分析项目_面试汇报_精简版.pptx) · [分析明细](outputs/advanced_tables.xlsx) |
-| ④ SQL 取数 | 19 道业务取数题：业务原话 → 口径 → SQL → 自检 → 错误写法对比 → 追问，全部在 MySQL 8.0 实际运行 | [题库（答案版）](docs/05_SQL面试题库.md) · [练习版](docs/05_SQL面试题_练习版.md) · [SQL 文件](sql/interview/) |
-| Hive / Spark SQL | 5 道题按 Hive 分区表重写，在 Spark 4.0 + Hive Metastore 上运行，与 MySQL 结果逐行核对；分区裁剪、数据倾斜、小文件都有实际运行的演示 | [HiveQL 与 Spark SQL 版本](docs/08_HiveQL与SparkSQL版本.md) · [HQL 文件](sql/hive/) |
-| 笔试模拟 | 45 分钟 / 100 分的 SQL 笔试卷，6 道新题，附评分点、实际运行结果和常见扣分写法 | [试卷](docs/09_SQL笔试模拟卷.md) · [答案与评分](docs/09_SQL笔试模拟卷_答案与评分.md) |
-| 数据核查 | 数据说明与处理方式、18 项数据校验；标注样本评估（标签精确率 97.4%、标签召回率 74.5%） | [数据说明](docs/01_数据说明与清洗规则.md) · [校验报告](outputs/qa/dq_report.md) · [标注样本](outputs/qa/tag_gold_set.csv) |
-| 讲稿与问答 | 1 分钟版、5 分钟版讲稿（每部分：关键术语 → 结论 → 依据 → 动作，每个数字附定义）；能力与证据对照、演示顺序、追问与回答 | [面试讲稿](docs/10_面试讲稿.md) · [问答准备](docs/06_面试讲述与问答准备.md) |
 | 外部参考 | 市场监管总局抽查结果、穿戴类 GMV 占比（来自公告、新闻转载与财报报道，附出处） | [data/external/](data/external/) |
 | 工程化 | 单元测试（标签规则、标注样本回归、统计检验、Hive 对账、术语检查）；GitHub Actions 每次推送在干净环境里从原始数据重跑全流程；Docker 一键复现 | [tests/](tests/) · [CI 配置](.github/workflows/ci.yml) · [Dockerfile](Dockerfile) |
 
