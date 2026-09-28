@@ -4,7 +4,8 @@
 
 用 Olist 巴西电商平台公开的约 10 万笔**真实订单**，按 JD 的四项职责做了四件可交付的东西：品控指标体系、经营看板、专题分析、SQL 取数题库。
 
-![看板总览](docs/images/dashboard_overview_top.png)
+![看板总览](<img width="1919" height="859" alt="image" src="https://github.com/user-attachments/assets/2e53dd9b-dff8-4f43-b590-17ca9477d462" />
+)
 
 ## 核心结论
 
