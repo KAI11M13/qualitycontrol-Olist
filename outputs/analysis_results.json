@@ -80,7 +80,7 @@
   },
   "decomp_category_top": {
     "3C数码": 0.00196,
-    "钟表礼品": 0.00192,
+    "钟表与潮流好物": 0.00192,
     "家居家纺": 0.001638,
     "母婴玩具": 0.001417
   },
@@ -165,7 +165,7 @@
       "gmv": 0.056751
     }
   },
-  "platform_qc_rate_seller_grain": 0.0533,
+  "seller_benchmark_qc_rate": 0.0533,
   "seller_eligible": 299,
   "seller_eligible_order_cover": 0.6794,
   "pareto_top10pct_orders_qc_share": 0.254969,
@@ -343,7 +343,7 @@
         "customers": 2487,
         "repurchase_rate": 0.039
       },
-      "2 首单其他差评": {
+      "2 首单差评（非品质）": {
         "customers": 5240,
         "repurchase_rate": 0.0389
       },
@@ -364,21 +364,21 @@
       {
         "code": "A",
         "name": "多件订单出库复核 + 分包裹提醒",
-        "assumption": "多件订单的少件/漏发客诉减少 50%",
+        "assumption": "多件订单中命中少件漏发标签的品质客诉订单减少 50%",
         "delta_pp": 0.007181,
         "rate_after": 0.042822
       },
       {
         "code": "B",
-        "name": "高风险/需关注商家整改",
-        "assumption": "该类商家的品质客诉减少 30%",
+        "name": "高风险商家和需关注商家整改",
+        "assumption": "主商家为高风险商家或需关注商家的品质客诉订单减少 30%",
         "delta_pp": 0.003112,
         "rate_after": 0.03971
       },
       {
         "code": "C",
-        "name": "3C数码/钟表礼品 正品与描述专项",
-        "assumption": "两类目假货 + 货不对板客诉减少 30%",
+        "name": "3C数码、钟表与潮流好物正品与商品描述专项",
+        "assumption": "主品类属于一级类目 3C数码、钟表与潮流好物且命中假货或货不对板标签的品质客诉订单减少 30%",
         "delta_pp": 0.001548,
         "rate_after": 0.038162
       }

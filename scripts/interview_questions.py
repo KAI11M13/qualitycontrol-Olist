@@ -29,7 +29,7 @@ RV = """rv AS (   -- 每单只留用户最后一次提交的评价
     WHERE rn = 1
 )"""
 
-QC = """qc AS (   -- 品质客诉订单：1-3 星 且 命中任一品质类标签
+QC = """qc AS (   -- 最后一次评价 1-3 星且命中任一品质问题标签的订单（再限定签收订单，就是品质客诉订单）
     SELECT rv.order_id, rv.review_answer_timestamp
     FROM rv
     JOIN review_tags tg ON tg.review_id = rv.review_id AND tg.order_id = rv.order_id
@@ -43,11 +43,11 @@ Q = []
 
 # =================================================================== 基础
 Q.append(dict(
-    id="Q01", level="基础", title="月度订单概览：下单、签收、准时率",
+    id="Q01", level="基础", title="月度订单概览：下单、签收、准时签收率",
     points=["条件聚合 SUM(条件)", "半开区间取数", "NULLIF 防除零"],
-    ask="帮我拉一下 2018 年每个月的下单量、签收量、签收率和准时签收率，周会要用。",
-    caliber=["下单量 = 按下单时间落月的订单数", "签收量 = 状态为 delivered 且签收时间不为空的订单",
-             "签收率 = 签收量 ÷ 下单量", "准时签收率 = 签收日期 ≤ 承诺送达日期的签收单 ÷ 签收量",
+    ask="帮我拉一下 2018 年每个月的下单订单数、签收订单数、签收率和准时签收率，周会要用。",
+    caliber=["下单订单数 = 按下单时间落月的订单数", "签收订单 = 状态为 delivered 且签收时间不为空的订单",
+             "签收率 = 签收订单数 ÷ 下单订单数", "准时签收率 = 签收日期不晚于承诺送达日期的签收订单数 ÷ 签收订单数",
              "时间 = 下单时间 ∈ [2018-01-01, 2018-09-01)"],
     assume=["\"2018 年\"按数据截止取到 8 月（9 月以后只有零星订单）", "承诺送达时间只有日期部分，按自然日比较"],
     logic=["按月分组", "用 SUM(布尔表达式) 一次算出多个计数", "比率分母加 NULLIF"],
@@ -82,7 +82,7 @@ FROM (
     FROM qc_interview.orders
     WHERE order_purchase_timestamp >= '2018-01-01' AND order_purchase_timestamp < '2018-09-01'
     GROUP BY m) a
-JOIN vip_qc.ads_qc_kpi_month k ON k.purchase_month = a.m;""",
+JOIN qc_dw.ads_qc_kpi_month k ON k.purchase_month = a.m;""",
     wrong="""-- ❌ 用 BETWEEN 写日期：'2018-08-31' 会被当成 2018-08-31 00:00:00，当天的订单全部丢失
 SELECT COUNT(*) AS order_cnt_between,
        (SELECT COUNT(*) FROM orders
@@ -91,7 +91,7 @@ FROM orders
 WHERE order_purchase_timestamp BETWEEN '2018-01-01' AND '2018-08-31';""",
     wrong_note="这份数据 8 月 31 日只有 1 单，所以只差 1 单；换成日报或者大促当天，就是整天的数据丢失。",
     pitfalls=["DATETIME 字段用 BETWEEN 截止日会漏掉最后一天 00:00:00 之后的数据，一律用半开区间",
-              "准时率的分母是签收单，不是下单量",
+              "准时签收率的分母是签收订单，不是下单量",
               "状态为 delivered 但签收时间为空的 8 单，要么剔除要么单独说明，不能默认当作准时"],
     followups=["如果周会要看\"周\"而不是\"月\"，周一作为一周开始怎么写？（YEARWEEK(dt, 3) 或 dt - INTERVAL WEEKDAY(dt) DAY）",
                "签收率在最近一个月偏低，是业务变差了吗？（右删失：最近下单的订单还没来得及签收）"],
@@ -124,7 +124,7 @@ WHERE rn = 1;""",
 FROM (SELECT order_id, ROW_NUMBER() OVER (PARTITION BY order_id
       ORDER BY review_answer_timestamp DESC, review_id DESC) rn FROM order_reviews) t
 WHERE rn = 1;""",
-    cross="""SELECT (SELECT COUNT(*) FROM vip_qc.dwd_review) = 98673 AS ok, '与数仓 dwd_review 行数一致（98,673）' AS note;""",
+    cross="""SELECT (SELECT COUNT(*) FROM qc_dw.dwd_review) = 98673 AS ok, '与数仓 dwd_review 行数一致（98,673）' AS note;""",
     pitfalls=["ORDER BY 只写时间不加唯一键时，同一时间的两条评价谁排第一不确定，每次跑结果可能不同",
               "不能用 GROUP BY order_id + MAX(review_score)——那样拿到的是\"最高分\"，不是\"最后一次\"的分",
               "review_id 本身也不唯一（789 个 review_id 对应多个订单），不能按 review_id 去重"],
@@ -184,12 +184,12 @@ LIMIT 10;""",
 
 # =================================================================== 进阶
 Q.append(dict(
-    id="Q04", level="进阶", title="月度品质客诉率（北极星指标）",
+    id="Q04", level="进阶", title="月度品质客诉率（核心指标）",
     points=["多个 CTE 分层", "评价去重 + 打标表关联", "LEFT JOIN 保留分母", "按下单月 cohort 归属"],
-    ask="品控这边想看每个月的品质客诉率，就是用户收到货以后投诉商品质量问题的比例。",
-    caliber=["分母 = 当月下单、且已签收的订单", "分子 = 分母中，最后一次评价为 1-3 星且命中任一品质类标签（假货 / 质量缺陷 / 货不对板 / 少件漏发 / 包装破损）的订单",
+    ask="品控这边想看每个月的品质客诉率，就是签收订单里，用户因为商品本身的问题给差评的比例。",
+    caliber=["分母 = 当月下单的签收订单", "分子 = 分母中，最后一次评价为 1-3 星且命中任一品质问题标签（假货、质量缺陷、货不对板、少件漏发、包装破损）的订单，即品质客诉订单",
              "时间 = 按下单月归属，[2017-01-01, 2018-09-01)"],
-    assume=["\"投诉质量问题\"用 NLP 打标结果 review_tags 判断", "4-5 星的评价即使提到缺陷词也不算（多为\"没有瑕疵\"之类的正面表述）"],
+    assume=["\"商品本身的问题\"用关键词规则识别出的标签表 review_tags 判断", "4-5 星的评价即使提到缺陷词也不算（多为\"没有瑕疵\"之类的正面表述）"],
     logic=["rv：评价去重", "qc：去重后的评价关联标签，筛出品质客诉订单", "dlv：签收订单作为分母，LEFT JOIN qc 后按月聚合"],
     sql=f"""WITH {RV},
 {QC},
@@ -221,20 +221,20 @@ a AS (
     WHERE {DELIVERED} AND o.order_purchase_timestamp >= '2017-01-01' AND o.order_purchase_timestamp < '2018-09-01'
     GROUP BY m)
 SELECT SUM(a.qc <> k.qc_cnt OR a.d <> k.delivered_cnt) = 0 AS ok, '20 个月的分子、分母与数仓 ads_qc_kpi_month 完全一致' AS note
-FROM a JOIN vip_qc.ads_qc_kpi_month k ON k.purchase_month = a.m;""",
-    pitfalls=["分母必须用 LEFT JOIN 保留，没有客诉的签收单也要计入分母",
+FROM a JOIN qc_dw.ads_qc_kpi_month k ON k.purchase_month = a.m;""",
+    pitfalls=["分母必须用 LEFT JOIN 保留，不是品质客诉订单的签收订单也要计入分母",
               "review_id 不唯一，关联打标表要用 (review_id, order_id) 两个字段",
-              "分子分母必须是同一批订单（都按下单月），不能\"本月投诉数 ÷ 本月签收数\"（见 Q18）"],
+              "分子分母必须是同一批订单（都按下单月），不能用\"本月评价数 ÷ 本月签收订单数\"（见 Q18）"],
     followups=["如果要按周看，并且要剔除\"订单时间倒挂\"的脏数据，改哪里？",
-               "品质客诉率上升了 0.7pp，你怎么判断是结构变化（卖了更多高风险品类）还是品类本身变差？（因素分解）"],
+               "品质客诉率上升了 0.69pp（2017 年 → 2018 年 1-8 月），你怎么判断是结构效应（卖了更多高品质客诉率的类目）还是组内效应（同一类目自身变差）？（因素分解）"],
 ))
 
 Q.append(dict(
     id="Q05", level="进阶", title="每个一级类目里，品质客诉率最高的 3 个品类",
     points=["分组 TopN：DENSE_RANK() OVER (PARTITION BY …)", "HAVING 过滤小样本", "订单 × 品类粒度"],
     ask="每个大类里挑出品质问题最严重的 3 个品类，下周类目运营要逐个过。样本太小的不算。",
-    caliber=["范围 = 2018-01 ~ 2018-08 下单且已签收", "品质客诉率 = 品质客诉单 ÷ 签收单（同 Q04）",
-             "品类归属 = 订单 × 品类去重", "最小样本 = 签收单 ≥ 100", "排名 = 一级类目内按客诉率倒序，并列同名次"],
+    caliber=["范围 = 2018-01 ~ 2018-08 下单且已签收", "品质客诉率 = 品质客诉订单 ÷ 签收订单（同 Q04）",
+             "品类归属 = 订单 × 品类去重", "最小样本 = 签收订单 ≥ 100", "排名 = 一级类目内按品质客诉率倒序，并列同名次"],
     assume=["并列时都保留（DENSE_RANK），所以一个大类可能返回多于 3 行", "品类缺失的商品不参与"],
     logic=["复用 Q04 的 rv / qc", "订单 × 品类去重并限定时间", "品类聚合 → 类目内排名 → 取前 3"],
     sql=f"""WITH {RV},
@@ -285,8 +285,8 @@ Q.append(dict(
     points=["条件聚合做两期对比", "HAVING 引用聚合别名", "订单 × 商家粒度"],
     ask="有没有哪些商家最近品质明显变差了？拿最近三个月和之前三个月比，给我恶化最多的 10 家。",
     caliber=["近 3 月 = 2018-06 ~ 2018-08 下单；前 3 月 = 2018-03 ~ 2018-05 下单", "品质客诉率同 Q04，按订单 × 商家归属",
-             "两期签收单都 ≥ 20", "恶化幅度 = 近 3 月客诉率 − 前 3 月客诉率（百分点）"],
-    assume=["一单多商家时，该订单的评价同时计入每个商家"],
+             "两期签收订单都 ≥ 20", "恶化幅度 = 近 3 月品质客诉率 − 前 3 月品质客诉率（百分点）"],
+    assume=["一个订单含多个商家时，该订单的评价同时计入每个商家"],
     logic=["订单 × 商家去重并打上期别", "一次 GROUP BY 用条件聚合算出两期分子分母", "算差值排序"],
     sql=f"""WITH {RV},
 {QC},
@@ -323,20 +323,20 @@ LIMIT 10;""",
 FROM (SELECT DISTINCT o.order_id, oi.seller_id FROM orders o JOIN order_items oi ON oi.order_id = o.order_id
       WHERE {DELIVERED} AND o.order_purchase_timestamp >= '2018-03-01' AND o.order_purchase_timestamp < '2018-09-01') t;""",
     pitfalls=["不做订单 × 商家去重，买了同一商家 3 件商品的订单会被算 3 次",
-              "两期都要设最小样本，否则前期 20 单 0 客诉、后期 20 单 2 客诉就排第一，全是噪音",
-              "只看百分点差值会偏向小商家，可以同时输出客诉单增量，或用显著性检验（追问）"],
+              "两期都要设最小样本，否则前期 20 单 0 个品质客诉订单、后期 20 单 2 个就排第一，全是噪音",
+              "只看百分点差值会偏向小商家，可以同时输出品质客诉订单的增量，或用显著性检验（追问）"],
     followups=["怎么判断变化是不是显著的？（两比例 z 检验：z = (p2 − p1) / sqrt(p(1−p)(1/n1 + 1/n2))）",
-               "近 3 个月里最后一个月评价还没回收完整，会不会低估近期客诉率？怎么处理？"],
+               "近 3 个月里最后一个月评价还没回收完整，会不会低估近期的品质客诉率？怎么处理？"],
 ))
 
 Q.append(dict(
     id="Q07", level="进阶", title="品质客诉率连续 3 个月上升的品类（预警）",
     points=["LAG() 取前 N 期", "WINDOW 子句复用窗口", "PERIOD_DIFF 校验月份连续"],
     ask="帮我找出品质客诉率连续 3 个月上升的品类，做个预警。",
-    caliber=["月度品类客诉率：订单 × 品类，签收单 ≥ 30 的月份才参与", "连续 3 个月上升 = 连续 3 次环比上升（r(m) > r(m−1) > r(m−2) > r(m−3)）",
+    caliber=["月度品类品质客诉率：订单 × 品类，签收订单 ≥ 30 的月份才参与", "连续 3 个月上升 = 连续 3 次环比上升（r(m) > r(m−1) > r(m−2) > r(m−3)）",
              "四个月必须是连续的自然月", "时间 = 2017-01 ~ 2018-08"],
     assume=["样本不足 30 单的月份视为\"无数据\"，会打断连续性"],
-    logic=["品类 × 月聚合", "LAG 取前 1/2/3 期的客诉率和前 3 期的月份", "判断三次上升且月份连续"],
+    logic=["品类 × 月聚合", "LAG 取前 1/2/3 期的品质客诉率和前 3 期的月份", "判断三次上升且月份连续"],
     sql=f"""WITH {RV},
 {QC},
 oc AS (
@@ -384,21 +384,21 @@ SELECT SUM(PERIOD_DIFF(REPLACE(month, '-', ''), REPLACE(l3, '-', '')) > 3) > 0 A
 FROM g WHERE l3 IS NOT NULL;""",
     pitfalls=["LAG 取的是\"上一行\"，不是\"上个月\"：某个月样本不足被过滤后，LAG 会跨月取数，必须校验月份连续",
               "\"连续 3 个月上升\"要先和业务确认是 3 次上升（看 4 个月）还是 2 次上升（看 3 个月）",
-              "小品类月度波动大，预警前最好加最小样本，或者用 3 个月滚动客诉率"],
-    followups=["改成\"3 个月滚动客诉率\"连续上升怎么写？（先用 SUM() OVER (ROWS 2 PRECEDING) 算滚动分子分母）",
-               "预警上线后，怎么评估这条规则的准确率？"],
+              "小品类月度波动大，预警前最好加最小样本，或者用 3 个月滚动品质客诉率"],
+    followups=["改成\"3 个月滚动品质客诉率\"连续上升怎么写？（先用 SUM() OVER (ROWS 2 PRECEDING) 算滚动分子分母）",
+               "预警上线后，怎么评估这条规则有没有用？（触发的品类下个月是否真的更差）"],
 ))
 
 Q.append(dict(
-    id="Q08", level="进阶", title="单件订单 vs 多件订单的少件投诉率",
+    id="Q08", level="进阶", title="单件订单 vs 多件订单的少件漏发客诉率",
     points=["一对多关联前先聚合（防止数据放大）", "错误写法对比"],
-    ask="听说买多件的订单老是少发，帮我对比一下单件订单和多件订单的少件投诉率。",
-    caliber=["单件 = 订单只有 1 个商品行；多件 = 商品行 ≥ 2", "少件投诉率 = 少件/漏发客诉单（1-3 星且 is_missing = 1）÷ 签收单",
+    ask="听说买多件的订单老是少发，帮我对比一下单件订单和多件订单的少件漏发客诉率。",
+    caliber=["单件 = 订单只有 1 个商品行；多件 = 商品行 ≥ 2", "少件漏发客诉率 = 少件漏发客诉订单（1-3 星且 is_missing = 1）÷ 签收订单",
              "范围 = 2018-01 ~ 2018-08 下单且已签收"],
     assume=["\"多件\"按商品行数判断，同一商品买 2 件在源表里是 2 行"],
-    logic=["商品行先聚合到订单粒度得到件数", "订单表关联件数和少件客诉", "按单件 / 多件分组"],
+    logic=["商品行先聚合到订单粒度得到件数", "订单表关联件数和少件漏发客诉订单", "按单件 / 多件分组"],
     sql=f"""WITH {RV},
-miss AS (   -- 少件/漏发客诉订单
+miss AS (   -- 少件漏发客诉订单
     SELECT rv.order_id
     FROM rv
     JOIN review_tags tg ON tg.review_id = rv.review_id AND tg.order_id = rv.order_id
@@ -422,12 +422,12 @@ WHERE {DELIVERED}
   AND o.order_purchase_timestamp <  '2018-09-01'
 GROUP BY order_type
 ORDER BY order_type;""",
-    check=f"""SELECT COUNT(*) AS ok_base, '2018 年 1-8 月有商品明细的签收单（答案两行之和应等于它）' AS note
+    check=f"""SELECT COUNT(*) AS ok_base, '2018 年 1-8 月有商品明细的签收订单（答案两行之和应等于它）' AS note
 FROM orders o WHERE {DELIVERED}
   AND o.order_purchase_timestamp >= '2018-01-01' AND o.order_purchase_timestamp < '2018-09-01'
   AND EXISTS (SELECT 1 FROM order_items oi WHERE oi.order_id = o.order_id);""",
     answer_assert=lambda df, chk: (int(df.delivered_cnt.sum()) == int(chk.ok_base.iloc[0]),
-                                   f"答案两行签收单之和 {int(df.delivered_cnt.sum()):,} = 基数 {int(chk.ok_base.iloc[0]):,}"),
+                                   f"答案两行签收订单之和 {int(df.delivered_cnt.sum()):,} = 基数 {int(chk.ok_base.iloc[0]):,}"),
     wrong=f"""-- ❌ 直接 JOIN 商品行：多件订单按件数被重复计入分子和分母
 WITH {RV},
 miss AS (SELECT rv.order_id FROM rv JOIN review_tags tg ON tg.review_id = rv.review_id AND tg.order_id = rv.order_id
@@ -442,11 +442,11 @@ JOIN item_cnt ic    ON ic.order_id = o.order_id
 LEFT JOIN miss      ON miss.order_id = o.order_id
 WHERE {DELIVERED} AND o.order_purchase_timestamp >= '2018-01-01' AND o.order_purchase_timestamp < '2018-09-01'
 GROUP BY order_type ORDER BY order_type;""",
-    wrong_note="多件订单的签收单和客诉单都被放大成\"商品行数\"，件数越多的订单权重越大，少件率被高估。",
+    wrong_note="多件订单的签收订单数和少件漏发客诉订单数都被放大成\"商品行数\"，件数越多的订单权重越大，少件漏发客诉率被高估。",
     pitfalls=["orders JOIN order_items 后 COUNT(*) 数的是商品行，不是订单",
               "写完先做粒度检查：COUNT(*) 是否等于 COUNT(DISTINCT order_id)",
-              "\"多件\"还可以细分成同 SKU 多件 / 多 SKU / 多商家，多商家订单少件率最高（分包裹发货）"],
-    followups=["多件订单少件率高，一定是仓库漏发吗？还可能是什么原因？（分包裹未同时到达、用户提前评价）怎么用数据区分？",
+              "\"多件\"还可以细分成同 SKU 多件 / 多 SKU / 多商家，多商家订单的少件漏发客诉率最高（分包裹发货）"],
+    followups=["多件订单少件漏发客诉率高，一定是仓库漏发吗？还可能是什么原因？（分包裹未同时到达、用户提前评价）怎么用数据区分？",
                "如果要给仓配团队定目标，你会用哪个指标？"],
 ))
 
@@ -559,13 +559,13 @@ FROM co;""",
 ))
 
 Q.append(dict(
-    id="Q11", level="高阶", title="品质客诉的帕累托：多少商家贡献了 80% 的客诉",
+    id="Q11", level="高阶", title="品质客诉订单的帕累托：多少商家贡献了 80% 的品质客诉订单",
     points=["累计窗口 SUM() OVER (ORDER BY … ROWS UNBOUNDED PRECEDING)", "总量开窗求占比", "取第一个达标行"],
-    ask="品质问题是不是集中在少数商家身上？多少家商家贡献了 80% 的品质客诉？",
-    caliber=["范围 = 2018-01 ~ 2018-08 下单且已签收，订单 × 商家归属", "商家按品质客诉单数从高到低排序",
-             "输出 = 达到 80% 累计客诉占比所需的商家数、商家占比、对应订单占比"],
-    assume=["客诉单相同的商家按 seller_id 排序，保证结果确定"],
-    logic=["商家聚合客诉单和签收单", "累计求和 ÷ 总和得到累计占比", "取累计占比首次 ≥ 80% 的那一行"],
+    ask="品质问题是不是集中在少数商家身上？多少家商家贡献了 80% 的品质客诉订单？",
+    caliber=["范围 = 2018-01 ~ 2018-08 下单且已签收，订单 × 商家归属", "商家按品质客诉订单数从高到低排序",
+             "输出 = 累计品质客诉订单占比达到 80% 所需的商家数、商家占比、对应签收订单占比"],
+    assume=["品质客诉订单数相同的商家按 seller_id 排序，保证结果确定"],
+    logic=["商家聚合品质客诉订单数和签收订单数", "累计求和 ÷ 总和得到累计占比", "取累计占比首次 ≥ 80% 的那一行"],
     sql=f"""WITH {RV},
 {QC},
 os AS (
@@ -606,20 +606,22 @@ os AS (SELECT DISTINCT o.order_id, oi.seller_id FROM orders o JOIN order_items o
 s AS (SELECT os.seller_id, COUNT(q.order_id) qc_cnt FROM os LEFT JOIN qc q ON q.order_id = os.order_id GROUP BY os.seller_id)
 SELECT ABS(MAX(cum) - 1) < 1e-9 AS ok, '累计占比最后一行 = 100%' AS note
 FROM (SELECT SUM(qc_cnt) OVER (ORDER BY qc_cnt DESC, seller_id ROWS UNBOUNDED PRECEDING) / SUM(qc_cnt) OVER () AS cum FROM s) t;""",
-    pitfalls=["累计窗口不写 ROWS 时默认是 RANGE：客诉单相同的商家会被一起累加，累计占比出现\"跳台阶\"",
-              "按客诉单数排序天然偏向大商家：头部商家客诉多可能只是因为卖得多，要同时看订单占比",
-              "80% 的客诉来自 X% 商家，还要对比这些商家占多少订单，否则结论是\"商家越大投诉越多\"这种废话"],
-    followups=["改成按\"客诉率\"排序，结论会怎么变？为什么要配合最小样本？", "如果只能整治 20 家商家，你怎么选？"],
+    pitfalls=["累计窗口不写 ROWS 时默认是 RANGE：品质客诉订单数相同的商家会被一起累加，累计占比出现\"跳台阶\"",
+              "按品质客诉订单数排序天然偏向大商家：头部商家的品质客诉订单多，可能只是因为卖得多，要同时看签收订单占比",
+              "80% 的品质客诉订单来自 X% 的商家，还要对比这些商家占多少订单，否则结论只是\"商家越大，品质客诉订单越多\""],
+    followups=["改成按\"品质客诉率\"排序，结论会怎么变？为什么要配合最小样本？", "如果只能整治 20 家商家，你怎么选？"],
 ))
 
 Q.append(dict(
-    id="Q12", level="高阶", title="高风险商家圈选（平台基准 + 贝叶斯平滑）",
-    points=["CROSS JOIN 平台基准", "贝叶斯平滑处理小样本", "规则圈选"],
-    ask="按我们的规则圈一下高风险商家：近 6 个月客诉率超过平台 2 倍、且至少 3 单客诉。小商家别被误伤。",
-    caliber=["近 6 个月 = 2018-03 ~ 2018-08 下单且已签收，订单 × 商家归属", "平台客诉率 = 全部商家客诉单之和 ÷ 签收单之和",
-             "平滑客诉率 = (客诉单 + 50 × 平台客诉率) ÷ (签收单 + 50)", "高风险 = 签收单 ≥ 30 且 客诉单 ≥ 3 且 平滑客诉率 ≥ 2 × 平台客诉率"],
-    assume=["平滑强度 m = 50（相当于给每个商家先加 50 单\"平台平均水平\"的虚拟订单），与商家品质分模型一致"],
-    logic=["商家聚合", "单独算出平台基准并 CROSS JOIN", "按规则过滤并输出原始与平滑客诉率"],
+    id="Q12", level="高阶", title="高风险商家圈选（商家基准品质客诉率 + 贝叶斯平滑）",
+    points=["CROSS JOIN 商家基准品质客诉率", "贝叶斯平滑处理小样本", "规则圈选"],
+    ask="按我们的规则圈一下高风险商家：近 6 个月品质客诉率超过全部商家的 2 倍、且至少 3 个品质客诉订单。小商家别被误伤。",
+    caliber=["商家评估窗口 = 下单月 2018-03 至 2018-08 的签收订单，订单 × 商家归属（商家签收订单）",
+             "商家基准品质客诉率 = 全部商家的商家品质客诉订单之和 ÷ 商家签收订单之和",
+             "平滑品质客诉率 = (商家品质客诉订单 + 50 × 商家基准品质客诉率) ÷ (商家签收订单 + 50)",
+             "高风险商家 = 商家签收订单 ≥ 30 且 商家品质客诉订单 ≥ 3 且 平滑品质客诉率 ≥ 2 × 商家基准品质客诉率"],
+    assume=["平滑强度 m = 50（相当于给每个商家先加 50 单\"商家基准品质客诉率水平\"的虚拟订单），与数仓商家分层一致"],
+    logic=["商家聚合", "单独算出商家基准品质客诉率并 CROSS JOIN", "按规则过滤，并输出未平滑与平滑品质客诉率"],
     sql=f"""WITH {RV},
 {QC},
 os AS (
@@ -643,7 +645,7 @@ SELECT
     s.seller_id, s.delivered_cnt, s.qc_cnt,
     ROUND(s.qc_cnt / s.delivered_cnt, 4)                         AS raw_rate,
     ROUND((s.qc_cnt + 50 * p.p_rate) / (s.delivered_cnt + 50), 4) AS smooth_rate,
-    ROUND(p.p_rate, 4)                                           AS platform_rate
+    ROUND(p.p_rate, 4)                                           AS benchmark_rate
 FROM s
 CROSS JOIN p
 WHERE s.delivered_cnt >= 30
@@ -666,14 +668,14 @@ os AS (SELECT DISTINCT o.order_id, oi.seller_id FROM qc_interview.orders o JOIN 
 s AS (SELECT os.seller_id, COUNT(*) d, COUNT(q.order_id) qc FROM os LEFT JOIN qc q ON q.order_id = os.order_id GROUP BY os.seller_id),
 p AS (SELECT SUM(qc) / SUM(d) pr FROM s),
 mine AS (SELECT s.seller_id FROM s CROSS JOIN p WHERE s.d >= 30 AND s.qc >= 3 AND (s.qc + 50 * p.pr) / (s.d + 50) >= 2 * p.pr)
-SELECT (SELECT COUNT(*) FROM mine) = (SELECT COUNT(*) FROM vip_qc.ads_seller_scorecard WHERE risk_level = '高风险')
-   AND NOT EXISTS (SELECT 1 FROM vip_qc.ads_seller_scorecard sc WHERE sc.risk_level = '高风险'
+SELECT (SELECT COUNT(*) FROM mine) = (SELECT COUNT(*) FROM qc_dw.ads_seller_scorecard WHERE risk_level = '高风险')
+   AND NOT EXISTS (SELECT 1 FROM qc_dw.ads_seller_scorecard sc WHERE sc.risk_level = '高风险'
                    AND NOT EXISTS (SELECT 1 FROM mine WHERE mine.seller_id = sc.seller_id)) AS ok,
        '圈出的名单与数仓 ads_seller_scorecard 的高风险商家完全一致' AS note;""",
-    pitfalls=["直接用原始客诉率 ≥ 2 倍会圈进一大批\"10 单 1 客诉\"的小商家，治理资源被浪费",
-              "平台基准要在全部商家上算，不能只在\"签收 ≥ 30\"的商家上算（口径要和指标字典一致）",
+    pitfalls=["直接用未平滑的品质客诉率 ≥ 2 倍会圈进一大批\"10 单里 1 个品质客诉订单\"的小商家，治理资源被浪费",
+              "商家基准品质客诉率要在全部商家上算，不能只在参评商家（商家签收订单 ≥ 30）上算（口径要和指标字典一致）",
               "平滑参数 m 要写进口径，调整 m 会改变名单"],
-    followups=["m = 50 怎么定？（可以用经验贝叶斯：拟合商家客诉率的 Beta 分布，用先验参数之和作为 m）",
+    followups=["m = 50 怎么定？（可以用经验贝叶斯：拟合商家品质客诉率的 Beta 分布，用先验参数之和作为 m）",
                "圈出来的商家整改后，怎么评估整改效果？（整改前后对比 + 对照组，注意均值回归）"],
 ))
 
@@ -761,18 +763,19 @@ FROM (
 ))
 
 Q.append(dict(
-    id="Q15", level="高阶", title="连续 3 天都收到品质投诉的商家（预警规则回溯）",
+    id="Q15", level="高阶", title="按评价日期连续 3 天都有品质客诉订单的商家（预警规则回溯）",
     points=["Gaps & Islands：日期 − ROW_NUMBER", "先去重到天", "HAVING 取连续段长度"],
-    ask="做个预警规则：某个商家如果连续 3 天每天都收到品质投诉，就要立刻介入。历史上触发过的商家有哪些？",
-    caliber=["投诉日期 = 评价提交日（review_answer_timestamp 的日期）", "品质投诉 = 同 Q04（1-3 星且命中品质标签，不限是否签收）",
-             "一个商家同一天多单投诉算 1 天", "连续 3 天 = 自然日连续 ≥ 3 天"],
-    assume=["一单多商家时，投诉同时计入每个商家"],
-    logic=["商家 × 投诉日去重", "日期减去组内序号，连续日期得到同一个分组值", "按分组聚合求连续天数"],
+    ask="做个预警规则：某个商家如果连续 3 天每天都有品质客诉订单，就要立刻介入。历史上触发过的商家有哪些？",
+    caliber=["评价日期 = 最后一次评价的提交日期（review_answer_timestamp 的日期）", "品质客诉订单 = 同 Q04（签收订单中，最后一次评价 1-3 星且命中品质问题标签）",
+             "一个商家同一天有多个品质客诉订单算 1 天", "连续 3 天 = 自然日连续 ≥ 3 天"],
+    assume=["一个订单含多个商家时，同时计入每个商家"],
+    logic=["商家 × 评价日期去重", "日期减去组内序号，连续日期得到同一个分组值", "按分组聚合求连续天数"],
     sql=f"""WITH {RV},
 {QC},
-sd AS (   -- 商家 × 投诉日（去重到天）
+sd AS (   -- 商家 × 评价日期（去重到天）
     SELECT DISTINCT oi.seller_id, DATE(q.review_answer_timestamp) AS d
     FROM qc q
+    JOIN orders o       ON o.order_id = q.order_id AND {DELIVERED}
     JOIN order_items oi ON oi.order_id = q.order_id
 ),
 g AS (
@@ -786,12 +789,13 @@ GROUP BY seller_id, grp
 HAVING COUNT(*) >= 3
 ORDER BY streak_days DESC, start_day;""",
     check=f"""WITH {RV}, {QC},
-sd AS (SELECT DISTINCT oi.seller_id, DATE(q.review_answer_timestamp) d FROM qc q JOIN order_items oi ON oi.order_id = q.order_id)
+sd AS (SELECT DISTINCT oi.seller_id, DATE(q.review_answer_timestamp) d FROM qc q JOIN orders o ON o.order_id = q.order_id AND {DELIVERED}
+        JOIN order_items oi ON oi.order_id = q.order_id)
 SELECT COUNT(*) = COUNT(DISTINCT seller_id, d) AS ok, '商家×日期已去重（否则同一天两单会被当成连续两天）' AS note FROM sd;""",
-    pitfalls=["不先去重到天，同一天 2 单投诉会让 ROW_NUMBER 多 1，连续段被算错",
+    pitfalls=["不先去重到天，同一天 2 个品质客诉订单会让 ROW_NUMBER 多 1，连续段被算错",
               "Gaps & Islands 的核心：连续日期减去连续序号得到同一个常数",
               "规则回溯要看触发频率：触发太多运营处理不过来，太少没有预警意义"],
-    followups=["如果改成\"7 天内累计 ≥ 3 次投诉\"，SQL 怎么写？（RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW）",
+    followups=["如果改成\"7 天内累计 ≥ 3 个品质客诉订单\"，SQL 怎么写？（RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW）",
                "这条规则历史上触发的商家，后来真的变成高风险了吗？怎么评估规则的有效性？"],
 ))
 
@@ -877,7 +881,7 @@ SELECT COUNT(*) = COUNT(DISTINCT order_id) AS ok, '导出结果一单一行' AS 
     JOIN rv ON rv.order_id = o.order_id AND rv.review_score <= 3
     WHERE o.order_purchase_timestamp >= '2018-08-01' AND o.order_purchase_timestamp < '2018-09-01'
     GROUP BY o.order_id) t;""",
-    pitfalls=["不 GROUP BY 订单时，一单买 2 个手机壳就导出 2 行，业务方会以为是 2 条投诉",
+    pitfalls=["不 GROUP BY 订单时，一单买 2 个手机壳就导出 2 行，业务方会以为是 2 条评价",
               "\"没写评价内容的也要\"——不要顺手加 review_comment_message IS NOT NULL",
               "GROUP_CONCAT 默认最长 1024 字节，超出静默截断；拼接长字段前先 SET SESSION group_concat_max_len"],
     followups=["如果业务方要的是\"订单里的手机通讯商品\"那一行，而不是整单，粒度怎么变？",
@@ -885,11 +889,11 @@ SELECT COUNT(*) = COUNT(DISTINCT order_id) AS ok, '导出结果一单一行' AS 
 ))
 
 Q.append(dict(
-    id="Q18", level="开放", title="口径对不上：看板 4.97% vs 业务自己算的数",
+    id="Q18", level="开放", title="口径对不上：看板上 2018-03 的品质客诉率 vs 业务方自己算的数",
     points=["口径差异定位", "cohort 口径 vs 事件时间口径", "用 SQL 把两种口径并排算出来"],
-    ask="你看板上 2018 年 3 月的品质客诉率是 4.97%，我按'3 月收到的品质投诉 ÷ 3 月签收的订单'算出来不一样，到底谁对？",
-    caliber=["口径 A（看板）：3 月下单且已签收的订单中，有品质客诉的比例", "口径 B（业务方）：分子 = 3 月提交的品质投诉（已签收订单），分母 = 3 月签收的订单"],
-    assume=["两种口径都只统计已签收订单的投诉，差异只来自时间归属"],
+    ask="你看板上 2018 年 3 月的品质客诉率，和我按'3 月提交的品质问题评价 ÷ 3 月签收的订单'算出来的不一样，到底谁对？",
+    caliber=["口径 A（看板）：3 月下单的签收订单中，品质客诉订单的比例（按下单月归属）", "口径 B（业务方）：分子 = 评价日期在 3 月的品质客诉订单，分母 = 签收日期在 3 月的签收订单"],
+    assume=["两种口径都只统计签收订单，差异只来自时间归属"],
     logic=["把两种口径各写一段 SQL", "UNION ALL 并排输出", "解释差异来源并给出建议"],
     sql=f"""WITH {RV},
 {QC},
@@ -900,7 +904,7 @@ a AS (   -- 口径 A：按下单月（cohort），分子分母是同一批订单
     WHERE {DELIVERED}
       AND o.order_purchase_timestamp >= '2018-03-01' AND o.order_purchase_timestamp < '2018-04-01'
 ),
-b AS (   -- 口径 B：投诉按提交月、签收按签收月，分子分母不是同一批订单
+b AS (   -- 口径 B：分子按评价月、分母按签收月，分子分母不是同一批订单
     SELECT
         (SELECT COUNT(*) FROM qc q JOIN orders o ON o.order_id = q.order_id
           WHERE {DELIVERED}
@@ -911,15 +915,15 @@ b AS (   -- 口径 B：投诉按提交月、签收按签收月，分子分母不
 )
 SELECT 'A 按下单月（看板口径）'          AS caliber, qc_cnt, delivered, ROUND(qc_cnt / delivered, 4) AS qc_rate FROM a
 UNION ALL
-SELECT 'B 投诉按提交月 / 签收按签收月', qc_cnt, delivered, ROUND(qc_cnt / delivered, 4) FROM b;""",
+SELECT 'B 分子按评价月 / 分母按签收月', qc_cnt, delivered, ROUND(qc_cnt / delivered, 4) FROM b;""",
     check="""SELECT 1 AS ok, '开放题：看结果解释差异' AS note;""",
     cross=f"""WITH {RV.replace('FROM order_reviews', 'FROM qc_interview.order_reviews')},
 {QC.replace('JOIN review_tags', 'JOIN qc_interview.review_tags')}
-SELECT ROUND(COUNT(q.order_id) / COUNT(*), 4) = (SELECT ROUND(qc_rate, 4) FROM vip_qc.ads_qc_kpi_month WHERE purchase_month = '2018-03') AS ok,
+SELECT ROUND(COUNT(q.order_id) / COUNT(*), 4) = (SELECT ROUND(qc_rate, 4) FROM qc_dw.ads_qc_kpi_month WHERE purchase_month = '2018-03') AS ok,
        '口径 A 与看板 3 月品质客诉率一致' AS note
 FROM qc_interview.orders o LEFT JOIN qc q ON q.order_id = o.order_id
 WHERE {DELIVERED} AND o.order_purchase_timestamp >= '2018-03-01' AND o.order_purchase_timestamp < '2018-04-01';""",
-    pitfalls=["两个数都\"对\"，只是回答的问题不同：A 回答\"3 月卖出去的货质量怎么样\"，B 回答\"3 月客服收到多少投诉\"",
+    pitfalls=["两个数都\"对\"，只是回答的问题不同：A 回答\"3 月卖出去的货质量怎么样\"，B 回答\"3 月收到了多少品质问题评价\"",
               "B 的分子里有 2 月甚至更早下单的订单，分母里也有 2 月下单、3 月才签收的订单，月初月末数据会失真",
               "口径对不上时先别争谁对，先把两种口径并排算出来，把差异拆到\"时间归属 / 范围 / 去重\"哪一项"],
     followups=["这两种口径分别适合什么场景？（A 适合评价供应商和品类质量；B 适合客服排班和实时监控）",
@@ -929,8 +933,8 @@ WHERE {DELIVERED} AND o.order_purchase_timestamp >= '2018-03-01' AND o.order_pur
 Q.append(dict(
     id="Q19", level="进阶", title="小品类月度报表：没有订单的月份也要显示 0",
     points=["递归 CTE 生成月份", "CROSS JOIN 维度骨架 + LEFT JOIN 事实", "COALESCE 补 0"],
-    ask="给我'空调冷暖''电脑整机''艺术品'这三个小品类 2018 年每个月的签收单和品质客诉单，没有订单的月份填 0，我要直接贴到周报表格里。",
-    caliber=["月份 = 2018-01 ~ 2018-08 全部 8 个月", "品类 = 指定 3 个", "签收单 / 品质客诉单口径同 Q04，订单 × 品类归属",
+    ask="给我'空调冷暖''电脑整机''艺术品'这三个小品类 2018 年每个月的签收订单和品质客诉订单，没有订单的月份填 0，我要直接贴到周报表格里。",
+    caliber=["月份 = 2018-01 ~ 2018-08 全部 8 个月", "品类 = 指定 3 个", "签收订单 / 品质客诉订单口径同 Q04，订单 × 品类归属",
              "输出 = 3 × 8 = 24 行，缺失月份补 0"],
     assume=["品类名用中文名匹配"],
     logic=["递归 CTE 生成 8 个月份", "月份 × 品类做骨架", "LEFT JOIN 聚合结果并 COALESCE"],
@@ -972,5 +976,5 @@ SELECT COUNT(*) * (SELECT COUNT(*) FROM category_dim WHERE category_cn IN ('空�
               "递归 CTE 默认最多 1000 层，生成日期序列时注意上限（cte_max_recursion_depth）",
               "这里用 COUNT(DISTINCT order_id)，因为 agg 直接在商品行上关联，一单多件会重复"],
     followups=["如果不能用递归 CTE（MySQL 5.7），月份骨架怎么造？（数字辅助表 / 日历维表）",
-               "周报里这 3 个品类样本很小，客诉率要不要展示？怎么展示才不误导？"],
+               "周报里这 3 个品类样本很小，品质客诉率要不要展示？怎么展示才不误导？"],
 ))

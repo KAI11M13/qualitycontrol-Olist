@@ -7,12 +7,28 @@ from matplotlib.ticker import PercentFormatter
 
 from common import FIG_DIR
 
-INK, INK2, MUTED, GRID, AXIS, SURFACE = "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7", "#fcfcfb"
-BLUE, ORANGE, AQUA, YELLOW = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"
-GRAY = "#c3c2b7"
-WARN, CRIT = "#fab219", "#d03b3b"
+# 配色：白底 + 玫红（#E1006C，主色）+ 95 度黑（#161418）；与 PPT（ppt/deck_kit.js）、看板一致
+INK, INK2, MUTED, GRID, AXIS, SURFACE = "#161418", "#4a454d", "#8a848d", "#ece8ec", "#cdc7cf", "#ffffff"
+PINK, PINK2, PINK_DARK, DARK = "#e1006c", "#f08cb8", "#8c0044", "#161418"   # 主色、浅玫红、深玫红、强调黑
+AMBER = "#e8a317"
+GRAY = "#cdc7cf"
+WARN, CRIT = AMBER, PINK          # 状态色：需关注 = 琥珀，高风险 = 玫红（与 PPT、看板相同）
 PCT = PercentFormatter(1.0, decimals=0)
 PCT1 = PercentFormatter(1.0, decimals=1)
+# 数据标签的写法与 docs/00_术语与口径.md 第 5 节一致
+QC = lambda v: f"{v * 100:.2f}%"          # 品质客诉率与结果指标（假货客诉率除外）
+SHARE = lambda v: f"{v * 100:.1f}%"       # 其他比率与占比
+FAKE = lambda v: f"{v * 1e4:.1f} 单/万单"  # 假货客诉率
+
+
+def month_labels(months):
+    """'2017-01' → 每年第一个月写成 '01\\n2017'，其余只写月份。"""
+    out, prev = [], None
+    for m in months:
+        y, mm = m[:4], m[5:7]
+        out.append(f"{mm}\n{y}" if y != prev else mm)
+        prev = y
+    return out
 
 plt.rcParams.update({
     "font.family": "Noto Sans CJK SC", "font.size": 11,

@@ -1,0 +1,1928 @@
+{
+ "Q01": {
+  "title": "月度订单概览：下单、签收、准时签收率",
+  "answer": [
+   {
+    "month": "2018-01",
+    "order_cnt": 7269,
+    "delivered_cnt": 7069.0,
+    "delivered_rate": 0.9725,
+    "on_time_rate": 0.943
+   },
+   {
+    "month": "2018-02",
+    "order_cnt": 6728,
+    "delivered_cnt": 6555.0,
+    "delivered_rate": 0.9743,
+    "on_time_rate": 0.8587
+   },
+   {
+    "month": "2018-03",
+    "order_cnt": 7211,
+    "delivered_cnt": 7003.0,
+    "delivered_rate": 0.9712,
+    "on_time_rate": 0.8104
+   },
+   {
+    "month": "2018-04",
+    "order_cnt": 6939,
+    "delivered_cnt": 6798.0,
+    "delivered_rate": 0.9797,
+    "on_time_rate": 0.955
+   },
+   {
+    "month": "2018-05",
+    "order_cnt": 6873,
+    "delivered_cnt": 6749.0,
+    "delivered_rate": 0.982,
+    "on_time_rate": 0.9344
+   },
+   {
+    "month": "2018-06",
+    "order_cnt": 6167,
+    "delivered_cnt": 6096.0,
+    "delivered_rate": 0.9885,
+    "on_time_rate": 0.9884
+   },
+   {
+    "month": "2018-07",
+    "order_cnt": 6292,
+    "delivered_cnt": 6156.0,
+    "delivered_rate": 0.9784,
+    "on_time_rate": 0.9662
+   },
+   {
+    "month": "2018-08",
+    "order_cnt": 6512,
+    "delivered_cnt": 6351.0,
+    "delivered_rate": 0.9753,
+    "on_time_rate": 0.9381
+   }
+  ],
+  "wrong": [
+   {
+    "order_cnt_between": 53990,
+    "order_cnt_correct": 53991
+   }
+  ]
+ },
+ "Q02": {
+  "title": "评价去重：每单只保留最后一次评价",
+  "answer": [
+   {
+    "orders_with_review": 98673,
+    "dup_orders": 547.0,
+    "removed_rows": 551.0,
+    "raw_rows": 99224
+   }
+  ],
+  "wrong": null
+ },
+ "Q03": {
+  "title": "差评率最高的 10 个品类",
+  "answer": [
+   {
+    "category_cn": "办公家具",
+    "reviewed_orders": 1263,
+    "bad_orders": 286.0,
+    "bad_rate": 0.2264
+   },
+   {
+    "category_cn": "床品布艺卫浴",
+    "reviewed_orders": 9313,
+    "bad_orders": 1561.0,
+    "bad_rate": 0.1676
+   },
+   {
+    "category_cn": "家具软装",
+    "reviewed_orders": 6398,
+    "bad_orders": 1067.0,
+    "bad_rate": 0.1668
+   },
+   {
+    "category_cn": "电脑配件",
+    "reviewed_orders": 6649,
+    "bad_orders": 1070.0,
+    "bad_rate": 0.1609
+   },
+   {
+    "category_cn": "婴童用品",
+    "reviewed_orders": 2861,
+    "bad_orders": 458.0,
+    "bad_rate": 0.1601
+   },
+   {
+    "category_cn": "手机通讯",
+    "reviewed_orders": 4168,
+    "bad_orders": 645.0,
+    "bad_rate": 0.1548
+   },
+   {
+    "category_cn": "钟表礼品",
+    "reviewed_orders": 5576,
+    "bad_orders": 848.0,
+    "bad_rate": 0.1521
+   },
+   {
+    "category_cn": "建筑工具",
+    "reviewed_orders": 743,
+    "bad_orders": 108.0,
+    "bad_rate": 0.1454
+   },
+   {
+    "category_cn": "汽车用品",
+    "reviewed_orders": 3877,
+    "bad_orders": 562.0,
+    "bad_rate": 0.145
+   },
+   {
+    "category_cn": "游戏主机",
+    "reviewed_orders": 1052,
+    "bad_orders": 150.0,
+    "bad_rate": 0.1426
+   }
+  ],
+  "wrong": [
+   {
+    "category_cn": "办公家具",
+    "reviewed_rows": 1677,
+    "bad_rows": 438.0,
+    "bad_rate": 0.2612
+   },
+   {
+    "category_cn": "家具软装",
+    "reviewed_rows": 8250,
+    "bad_rows": 1597.0,
+    "bad_rate": 0.1936
+   },
+   {
+    "category_cn": "床品布艺卫浴",
+    "reviewed_rows": 10982,
+    "bad_rows": 2072.0,
+    "bad_rate": 0.1887
+   },
+   {
+    "category_cn": "电脑配件",
+    "reviewed_rows": 7782,
+    "bad_rows": 1444.0,
+    "bad_rate": 0.1856
+   },
+   {
+    "category_cn": "家装建材",
+    "reviewed_rows": 599,
+    "bad_rows": 107.0,
+    "bad_rate": 0.1786
+   },
+   {
+    "category_cn": "手机通讯",
+    "reviewed_rows": 4512,
+    "bad_rows": 761.0,
+    "bad_rate": 0.1687
+   },
+   {
+    "category_cn": "婴童用品",
+    "reviewed_rows": 3040,
+    "bad_rows": 509.0,
+    "bad_rate": 0.1674
+   },
+   {
+    "category_cn": "钟表礼品",
+    "reviewed_rows": 5940,
+    "bad_rows": 966.0,
+    "bad_rate": 0.1626
+   },
+   {
+    "category_cn": "园艺工具",
+    "reviewed_rows": 4315,
+    "bad_rows": 690.0,
+    "bad_rate": 0.1599
+   },
+   {
+    "category_cn": "电子产品",
+    "reviewed_rows": 2748,
+    "bad_rows": 433.0,
+    "bad_rate": 0.1576
+   }
+  ]
+ },
+ "Q04": {
+  "title": "月度品质客诉率（核心指标）",
+  "answer": [
+   {
+    "month": "2017-01",
+    "delivered_cnt": 750,
+    "qc_cnt": 36,
+    "qc_rate": 0.048
+   },
+   {
+    "month": "2017-02",
+    "delivered_cnt": 1653,
+    "qc_cnt": 68,
+    "qc_rate": 0.0411
+   },
+   {
+    "month": "2017-03",
+    "delivered_cnt": 2546,
+    "qc_cnt": 118,
+    "qc_rate": 0.0463
+   },
+   {
+    "month": "2017-04",
+    "delivered_cnt": 2303,
+    "qc_cnt": 80,
+    "qc_rate": 0.0347
+   },
+   {
+    "month": "2017-05",
+    "delivered_cnt": 3545,
+    "qc_cnt": 133,
+    "qc_rate": 0.0375
+   },
+   {
+    "month": "2017-06",
+    "delivered_cnt": 3135,
+    "qc_cnt": 144,
+    "qc_rate": 0.0459
+   },
+   {
+    "month": "2017-07",
+    "delivered_cnt": 3872,
+    "qc_cnt": 159,
+    "qc_rate": 0.0411
+   },
+   {
+    "month": "2017-08",
+    "delivered_cnt": 4193,
+    "qc_cnt": 165,
+    "qc_rate": 0.0394
+   },
+   {
+    "month": "2017-09",
+    "delivered_cnt": 4150,
+    "qc_cnt": 169,
+    "qc_rate": 0.0407
+   },
+   {
+    "month": "2017-10",
+    "delivered_cnt": 4478,
+    "qc_cnt": 207,
+    "qc_rate": 0.0462
+   },
+   {
+    "month": "2017-11",
+    "delivered_cnt": 7288,
+    "qc_cnt": 332,
+    "qc_rate": 0.0456
+   },
+   {
+    "month": "2017-12",
+    "delivered_cnt": 5513,
+    "qc_cnt": 260,
+    "qc_rate": 0.0472
+   },
+   {
+    "month": "2018-01",
+    "delivered_cnt": 7069,
+    "qc_cnt": 351,
+    "qc_rate": 0.0497
+   },
+   {
+    "month": "2018-02",
+    "delivered_cnt": 6555,
+    "qc_cnt": 344,
+    "qc_rate": 0.0525
+   },
+   {
+    "month": "2018-03",
+    "delivered_cnt": 7003,
+    "qc_cnt": 348,
+    "qc_rate": 0.0497
+   },
+   {
+    "month": "2018-04",
+    "delivered_cnt": 6798,
+    "qc_cnt": 336,
+    "qc_rate": 0.0494
+   },
+   {
+    "month": "2018-05",
+    "delivered_cnt": 6749,
+    "qc_cnt": 347,
+    "qc_rate": 0.0514
+   },
+   {
+    "month": "2018-06",
+    "delivered_cnt": 6096,
+    "qc_cnt": 328,
+    "qc_rate": 0.0538
+   },
+   {
+    "month": "2018-07",
+    "delivered_cnt": 6156,
+    "qc_cnt": 308,
+    "qc_rate": 0.05
+   },
+   {
+    "month": "2018-08",
+    "delivered_cnt": 6351,
+    "qc_cnt": 277,
+    "qc_rate": 0.0436
+   }
+  ],
+  "wrong": null
+ },
+ "Q05": {
+  "title": "每个一级类目里，品质客诉率最高的 3 个品类",
+  "answer": [
+   {
+    "category_l1": "3C数码",
+    "rk": 1,
+    "category_cn": "手机通讯",
+    "delivered_cnt": 2117,
+    "qc_cnt": 152,
+    "qc_rate": 0.0718
+   },
+   {
+    "category_l1": "3C数码",
+    "rk": 2,
+    "category_cn": "电脑配件",
+    "delivered_cnt": 3971,
+    "qc_cnt": 257,
+    "qc_rate": 0.0647
+   },
+   {
+    "category_l1": "3C数码",
+    "rk": 3,
+    "category_cn": "影音设备",
+    "delivered_cnt": 187,
+    "qc_cnt": 11,
+    "qc_rate": 0.0588
+   },
+   {
+    "category_l1": "其他",
+    "rk": 1,
+    "category_cn": "工商业用品",
+    "delivered_cnt": 194,
+    "qc_cnt": 12,
+    "qc_rate": 0.0619
+   },
+   {
+    "category_l1": "其他",
+    "rk": 2,
+    "category_cn": "农业工商",
+    "delivered_cnt": 129,
+    "qc_cnt": 7,
+    "qc_rate": 0.0543
+   },
+   {
+    "category_l1": "图书文娱",
+    "rk": 1,
+    "category_cn": "专业图书",
+    "delivered_cnt": 213,
+    "qc_cnt": 8,
+    "qc_rate": 0.0376
+   },
+   {
+    "category_l1": "图书文娱",
+    "rk": 2,
+    "category_cn": "乐器",
+    "delivered_cnt": 370,
+    "qc_cnt": 11,
+    "qc_rate": 0.0297
+   },
+   {
+    "category_l1": "图书文娱",
+    "rk": 3,
+    "category_cn": "文具",
+    "delivered_cnt": 1367,
+    "qc_cnt": 34,
+    "qc_rate": 0.0249
+   },
+   {
+    "category_l1": "宠物",
+    "rk": 1,
+    "category_cn": "宠物用品",
+    "delivered_cnt": 1002,
+    "qc_cnt": 42,
+    "qc_rate": 0.0419
+   },
+   {
+    "category_l1": "家居家纺",
+    "rk": 1,
+    "category_cn": "办公家具",
+    "delivered_cnt": 636,
+    "qc_cnt": 75,
+    "qc_rate": 0.1179
+   },
+   {
+    "category_l1": "家居家纺",
+    "rk": 2,
+    "category_cn": "客厅家具",
+    "delivered_cnt": 211,
+    "qc_cnt": 15,
+    "qc_rate": 0.0711
+   },
+   {
+    "category_l1": "家居家纺",
+    "rk": 3,
+    "category_cn": "厨房餐厅庭院家具",
+    "delivered_cnt": 136,
+    "qc_cnt": 9,
+    "qc_rate": 0.0662
+   },
+   {
+    "category_l1": "家用电器",
+    "rk": 1,
+    "category_cn": "小家电",
+    "delivered_cnt": 314,
+    "qc_cnt": 20,
+    "qc_rate": 0.0637
+   },
+   {
+    "category_l1": "家用电器",
+    "rk": 2,
+    "category_cn": "家用电器",
+    "delivered_cnt": 515,
+    "qc_cnt": 31,
+    "qc_rate": 0.0602
+   },
+   {
+    "category_l1": "家用电器",
+    "rk": 3,
+    "category_cn": "家用电器2",
+    "delivered_cnt": 145,
+    "qc_cnt": 7,
+    "qc_rate": 0.0483
+   },
+   {
+    "category_l1": "服饰鞋包",
+    "rk": 1,
+    "category_cn": "旅行箱包",
+    "delivered_cnt": 463,
+    "qc_cnt": 17,
+    "qc_rate": 0.0367
+   },
+   {
+    "category_l1": "服饰鞋包",
+    "rk": 2,
+    "category_cn": "箱包配饰",
+    "delivered_cnt": 820,
+    "qc_cnt": 22,
+    "qc_rate": 0.0268
+   },
+   {
+    "category_l1": "母婴玩具",
+    "rk": 1,
+    "category_cn": "婴童用品",
+    "delivered_cnt": 1627,
+    "qc_cnt": 95,
+    "qc_rate": 0.0584
+   },
+   {
+    "category_l1": "母婴玩具",
+    "rk": 2,
+    "category_cn": "玩具",
+    "delivered_cnt": 1377,
+    "qc_cnt": 74,
+    "qc_rate": 0.0537
+   },
+   {
+    "category_l1": "汽配工具",
+    "rk": 1,
+    "category_cn": "标识安防",
+    "delivered_cnt": 105,
+    "qc_cnt": 10,
+    "qc_rate": 0.0952
+   },
+   {
+    "category_l1": "汽配工具",
+    "rk": 2,
+    "category_cn": "安防工具",
+    "delivered_cnt": 125,
+    "qc_cnt": 11,
+    "qc_rate": 0.088
+   },
+   {
+    "category_l1": "汽配工具",
+    "rk": 3,
+    "category_cn": "家装建材",
+    "delivered_cnt": 373,
+    "qc_cnt": 28,
+    "qc_rate": 0.0751
+   },
+   {
+    "category_l1": "美妆个护",
+    "rk": 1,
+    "category_cn": "香水香氛",
+    "delivered_cnt": 1458,
+    "qc_cnt": 52,
+    "qc_rate": 0.0357
+   },
+   {
+    "category_l1": "美妆个护",
+    "rk": 2,
+    "category_cn": "美妆健康",
+    "delivered_cnt": 5305,
+    "qc_cnt": 178,
+    "qc_rate": 0.0336
+   },
+   {
+    "category_l1": "运动户外",
+    "rk": 1,
+    "category_cn": "运动休闲",
+    "delivered_cnt": 3973,
+    "qc_cnt": 160,
+    "qc_rate": 0.0403
+   },
+   {
+    "category_l1": "钟表与潮流好物",
+    "rk": 1,
+    "category_cn": "钟表礼品",
+    "delivered_cnt": 3416,
+    "qc_cnt": 202,
+    "qc_rate": 0.0591
+   },
+   {
+    "category_l1": "钟表与潮流好物",
+    "rk": 2,
+    "category_cn": "潮流好物",
+    "delivered_cnt": 1391,
+    "qc_cnt": 58,
+    "qc_rate": 0.0417
+   },
+   {
+    "category_l1": "食品酒水",
+    "rk": 1,
+    "category_cn": "酒水饮料",
+    "delivered_cnt": 217,
+    "qc_cnt": 12,
+    "qc_rate": 0.0553
+   },
+   {
+    "category_l1": "食品酒水",
+    "rk": 2,
+    "category_cn": "食品",
+    "delivered_cnt": 338,
+    "qc_cnt": 15,
+    "qc_rate": 0.0444
+   },
+   {
+    "category_l1": "食品酒水",
+    "rk": 3,
+    "category_cn": "食品饮料",
+    "delivered_cnt": 117,
+    "qc_cnt": 1,
+    "qc_rate": 0.0085
+   }
+  ],
+  "wrong": null
+ },
+ "Q06": {
+  "title": "近 3 个月品质明显变差的商家",
+  "answer": [
+   {
+    "seller_id": "080102cd0a76b09e0dcf55fcacc60e05",
+    "d_before": 49.0,
+    "qc_before": 0.0,
+    "rate_before": 0.0,
+    "d_recent": 42.0,
+    "qc_recent": 4.0,
+    "rate_recent": 0.0952,
+    "change_pp": 9.52
+   },
+   {
+    "seller_id": "53e4c6e0f4312d4d2107a8c9cddf45cd",
+    "d_before": 75.0,
+    "qc_before": 1.0,
+    "rate_before": 0.0133,
+    "d_recent": 74.0,
+    "qc_recent": 8.0,
+    "rate_recent": 0.1081,
+    "change_pp": 9.48
+   },
+   {
+    "seller_id": "a3e9a2c700480d9bb01fba070ba80a0e",
+    "d_before": 20.0,
+    "qc_before": 0.0,
+    "rate_before": 0.0,
+    "d_recent": 32.0,
+    "qc_recent": 3.0,
+    "rate_recent": 0.0938,
+    "change_pp": 9.38
+   },
+   {
+    "seller_id": "282f23a9769b2690c5dda22e316f9941",
+    "d_before": 21.0,
+    "qc_before": 0.0,
+    "rate_before": 0.0,
+    "d_recent": 22.0,
+    "qc_recent": 2.0,
+    "rate_recent": 0.0909,
+    "change_pp": 9.09
+   },
+   {
+    "seller_id": "4e922959ae960d389249c378d1c939f5",
+    "d_before": 69.0,
+    "qc_before": 4.0,
+    "rate_before": 0.058,
+    "d_recent": 27.0,
+    "qc_recent": 4.0,
+    "rate_recent": 0.1481,
+    "change_pp": 9.02
+   },
+   {
+    "seller_id": "8648b1e89e9b349e32d3741b30ec737e",
+    "d_before": 28.0,
+    "qc_before": 1.0,
+    "rate_before": 0.0357,
+    "d_recent": 27.0,
+    "qc_recent": 3.0,
+    "rate_recent": 0.1111,
+    "change_pp": 7.54
+   },
+   {
+    "seller_id": "966cb4760537b1404caedd472cc610a5",
+    "d_before": 28.0,
+    "qc_before": 3.0,
+    "rate_before": 0.1071,
+    "d_recent": 39.0,
+    "qc_recent": 7.0,
+    "rate_recent": 0.1795,
+    "change_pp": 7.23
+   },
+   {
+    "seller_id": "c826c40d7b19f62a09e2d7c5e7295ee2",
+    "d_before": 104.0,
+    "qc_before": 2.0,
+    "rate_before": 0.0192,
+    "d_recent": 22.0,
+    "qc_recent": 2.0,
+    "rate_recent": 0.0909,
+    "change_pp": 7.17
+   },
+   {
+    "seller_id": "9e6229250fedbe05838fef417b74e7fb",
+    "d_before": 22.0,
+    "qc_before": 0.0,
+    "rate_before": 0.0,
+    "d_recent": 42.0,
+    "qc_recent": 3.0,
+    "rate_recent": 0.0714,
+    "change_pp": 7.14
+   },
+   {
+    "seller_id": "04308b1ee57b6625f47df1d56f00eedf",
+    "d_before": 30.0,
+    "qc_before": 2.0,
+    "rate_before": 0.0667,
+    "d_recent": 44.0,
+    "qc_recent": 6.0,
+    "rate_recent": 0.1364,
+    "change_pp": 6.97
+   }
+  ],
+  "wrong": null
+ },
+ "Q07": {
+  "title": "品质客诉率连续 3 个月上升的品类（预警）",
+  "answer": [
+   {
+    "category_cn": "钟表礼品",
+    "alert_month": "2018-07",
+    "rate_m3": 0.0411,
+    "rate_m2": 0.0632,
+    "rate_m1": 0.0676,
+    "rate_m0": 0.0891,
+    "delivered_cnt": 505
+   },
+   {
+    "category_cn": "汽车用品",
+    "alert_month": "2018-06",
+    "rate_m3": 0.0315,
+    "rate_m2": 0.0335,
+    "rate_m1": 0.0644,
+    "rate_m0": 0.0746,
+    "delivered_cnt": 268
+   },
+   {
+    "category_cn": "乐器",
+    "alert_month": "2018-05",
+    "rate_m3": 0.0,
+    "rate_m2": 0.0204,
+    "rate_m1": 0.0351,
+    "rate_m0": 0.0508,
+    "delivered_cnt": 59
+   },
+   {
+    "category_cn": "香水香氛",
+    "alert_month": "2018-05",
+    "rate_m3": 0.0206,
+    "rate_m2": 0.033,
+    "rate_m1": 0.0503,
+    "rate_m0": 0.0559,
+    "delivered_cnt": 179
+   },
+   {
+    "category_cn": "宠物用品",
+    "alert_month": "2018-03",
+    "rate_m3": 0.029,
+    "rate_m2": 0.0395,
+    "rate_m1": 0.0465,
+    "rate_m0": 0.0833,
+    "delivered_cnt": 108
+   },
+   {
+    "category_cn": "潮流好物",
+    "alert_month": "2018-02",
+    "rate_m3": 0.0315,
+    "rate_m2": 0.0346,
+    "rate_m1": 0.0421,
+    "rate_m0": 0.0455,
+    "delivered_cnt": 176
+   },
+   {
+    "category_cn": "电脑配件",
+    "alert_month": "2018-02",
+    "rate_m3": 0.0441,
+    "rate_m2": 0.0562,
+    "rate_m1": 0.061,
+    "rate_m0": 0.0847,
+    "delivered_cnt": 791
+   },
+   {
+    "category_cn": "婴童用品",
+    "alert_month": "2018-01",
+    "rate_m3": 0.0224,
+    "rate_m2": 0.0326,
+    "rate_m1": 0.0519,
+    "rate_m0": 0.0718,
+    "delivered_cnt": 209
+   },
+   {
+    "category_cn": "玩具",
+    "alert_month": "2018-01",
+    "rate_m3": 0.0368,
+    "rate_m2": 0.0384,
+    "rate_m1": 0.0484,
+    "rate_m0": 0.0649,
+    "delivered_cnt": 154
+   },
+   {
+    "category_cn": "电脑配件",
+    "alert_month": "2018-01",
+    "rate_m3": 0.0435,
+    "rate_m2": 0.0441,
+    "rate_m1": 0.0562,
+    "rate_m0": 0.061,
+    "delivered_cnt": 574
+   },
+   {
+    "category_cn": "电脑配件",
+    "alert_month": "2017-12",
+    "rate_m3": 0.0284,
+    "rate_m2": 0.0435,
+    "rate_m1": 0.0441,
+    "rate_m0": 0.0562,
+    "delivered_cnt": 249
+   },
+   {
+    "category_cn": "家具软装",
+    "alert_month": "2017-11",
+    "rate_m3": 0.0433,
+    "rate_m2": 0.0556,
+    "rate_m1": 0.0677,
+    "rate_m0": 0.069,
+    "delivered_cnt": 536
+   },
+   {
+    "category_cn": "游戏主机",
+    "alert_month": "2017-10",
+    "rate_m3": 0.0,
+    "rate_m2": 0.0127,
+    "rate_m1": 0.0345,
+    "rate_m0": 0.0505,
+    "delivered_cnt": 99
+   },
+   {
+    "category_cn": "箱包配饰",
+    "alert_month": "2017-10",
+    "rate_m3": 0.0125,
+    "rate_m2": 0.0235,
+    "rate_m1": 0.0495,
+    "rate_m0": 0.0538,
+    "delivered_cnt": 93
+   },
+   {
+    "category_cn": "钟表礼品",
+    "alert_month": "2017-10",
+    "rate_m3": 0.0265,
+    "rate_m2": 0.0309,
+    "rate_m1": 0.0398,
+    "rate_m0": 0.0603,
+    "delivered_cnt": 282
+   },
+   {
+    "category_cn": "床品布艺卫浴",
+    "alert_month": "2017-08",
+    "rate_m3": 0.0433,
+    "rate_m2": 0.0463,
+    "rate_m1": 0.0497,
+    "rate_m0": 0.0588,
+    "delivered_cnt": 442
+   },
+   {
+    "category_cn": "文具",
+    "alert_month": "2017-07",
+    "rate_m3": 0.0,
+    "rate_m2": 0.0167,
+    "rate_m1": 0.027,
+    "rate_m0": 0.0278,
+    "delivered_cnt": 72
+   },
+   {
+    "category_cn": "香水香氛",
+    "alert_month": "2017-07",
+    "rate_m3": 0.0206,
+    "rate_m2": 0.0379,
+    "rate_m1": 0.05,
+    "rate_m0": 0.0696,
+    "delivered_cnt": 115
+   },
+   {
+    "category_cn": "玩具",
+    "alert_month": "2017-06",
+    "rate_m3": 0.0101,
+    "rate_m2": 0.0194,
+    "rate_m1": 0.0208,
+    "rate_m0": 0.0533,
+    "delivered_cnt": 150
+   }
+  ],
+  "wrong": null
+ },
+ "Q08": {
+  "title": "单件订单 vs 多件订单的少件漏发客诉率",
+  "answer": [
+   {
+    "order_type": "单件",
+    "delivered_cnt": 47528,
+    "missing_cnt": 246,
+    "missing_rate": 0.0052
+   },
+   {
+    "order_type": "多件",
+    "delivered_cnt": 5249,
+    "missing_cnt": 758,
+    "missing_rate": 0.1444
+   }
+  ],
+  "wrong": [
+   {
+    "order_type": "单件",
+    "delivered_cnt": 47528,
+    "missing_cnt": 246,
+    "missing_rate": 0.0052
+   },
+   {
+    "order_type": "多件",
+    "delivered_cnt": 12790,
+    "missing_cnt": 1930,
+    "missing_rate": 0.1509
+   }
+  ]
+ },
+ "Q09": {
+  "title": "商家发货超时率（每个商家用自己的发货时限）",
+  "answer": [
+   {
+    "seller_id": "88460e8ebdecbfecb5f9601833981930",
+    "shipped_orders": 231,
+    "overdue_orders": 111.0,
+    "overdue_rate": 0.4805,
+    "avg_overdue_hours": 175.7
+   },
+   {
+    "seller_id": "e9bc59e7b60fc3063eb2290deda4cced",
+    "shipped_orders": 125,
+    "overdue_orders": 49.0,
+    "overdue_rate": 0.392,
+    "avg_overdue_hours": 69.9
+   },
+   {
+    "seller_id": "213b25e6f54661939f11710a6fddb871",
+    "shipped_orders": 149,
+    "overdue_orders": 51.0,
+    "overdue_rate": 0.3423,
+    "avg_overdue_hours": 25.2
+   },
+   {
+    "seller_id": "7c67e1448b00f6e969d365cea6b010ab",
+    "shipped_orders": 484,
+    "overdue_orders": 165.0,
+    "overdue_rate": 0.3409,
+    "avg_overdue_hours": 43.6
+   },
+   {
+    "seller_id": "2eb70248d66e0e3ef83659f71b244378",
+    "shipped_orders": 188,
+    "overdue_orders": 60.0,
+    "overdue_rate": 0.3191,
+    "avg_overdue_hours": 158.6
+   },
+   {
+    "seller_id": "06a2c3af7b3aee5d69171b0e14f0ee87",
+    "shipped_orders": 392,
+    "overdue_orders": 123.0,
+    "overdue_rate": 0.3138,
+    "avg_overdue_hours": 116.0
+   },
+   {
+    "seller_id": "4c2b230173bb36f9b240f2b8ac11786e",
+    "shipped_orders": 109,
+    "overdue_orders": 32.0,
+    "overdue_rate": 0.2936,
+    "avg_overdue_hours": 15.1
+   },
+   {
+    "seller_id": "b2ba3715d723d245138f291a6fe42594",
+    "shipped_orders": 114,
+    "overdue_orders": 32.0,
+    "overdue_rate": 0.2807,
+    "avg_overdue_hours": 24.5
+   },
+   {
+    "seller_id": "c31eff8334d6b3047ed34bebd4d62c36",
+    "shipped_orders": 121,
+    "overdue_orders": 33.0,
+    "overdue_rate": 0.2727,
+    "avg_overdue_hours": 49.1
+   },
+   {
+    "seller_id": "79ebd9a61bac3eaf882805ed4ecfa12a",
+    "shipped_orders": 108,
+    "overdue_orders": 28.0,
+    "overdue_rate": 0.2593,
+    "avg_overdue_hours": 14.5
+   }
+  ],
+  "wrong": null
+ },
+ "Q10": {
+  "title": "首单遇到品质问题的用户，还会回来复购吗",
+  "answer": [
+   {
+    "first_experience": "1 首单品质客诉",
+    "customers": 2488,
+    "repurchased": 70.0,
+    "repurchase_rate_180d": 0.0281
+   },
+   {
+    "first_experience": "2 首单其他差评",
+    "customers": 5237,
+    "repurchased": 149.0,
+    "repurchase_rate_180d": 0.0285
+   },
+   {
+    "first_experience": "3 首单无问题",
+    "customers": 47062,
+    "repurchased": 1350.0,
+    "repurchase_rate_180d": 0.0287
+   }
+  ],
+  "wrong": [
+   {
+    "customers": 99092,
+    "repurchase_rate": 0.0
+   }
+  ]
+ },
+ "Q11": {
+  "title": "品质客诉订单的帕累托：多少商家贡献了 80% 的品质客诉订单",
+  "answer": [
+   {
+    "sellers_needed": 333,
+    "n_sellers": 2330,
+    "seller_share": 0.1429,
+    "qc_share": 0.8001,
+    "order_share": 0.6315
+   }
+  ],
+  "wrong": null
+ },
+ "Q12": {
+  "title": "高风险商家圈选（商家基准品质客诉率 + 贝叶斯平滑）",
+  "answer": [
+   {
+    "seller_id": "2eb70248d66e0e3ef83659f71b244378",
+    "delivered_cnt": 182,
+    "qc_cnt": 62,
+    "raw_rate": 0.3407,
+    "smooth_rate": 0.2787,
+    "benchmark_rate": 0.0533
+   },
+   {
+    "seller_id": "88460e8ebdecbfecb5f9601833981930",
+    "delivered_cnt": 163,
+    "qc_cnt": 25,
+    "raw_rate": 0.1534,
+    "smooth_rate": 0.1299,
+    "benchmark_rate": 0.0533
+   },
+   {
+    "seller_id": "5dceca129747e92ff8ef7a997dc4f8ca",
+    "delivered_cnt": 58,
+    "qc_cnt": 11,
+    "raw_rate": 0.1897,
+    "smooth_rate": 0.1265,
+    "benchmark_rate": 0.0533
+   },
+   {
+    "seller_id": "d2374cbcbb3ca4ab1086534108cc3ab7",
+    "delivered_cnt": 167,
+    "qc_cnt": 22,
+    "raw_rate": 0.1317,
+    "smooth_rate": 0.1137,
+    "benchmark_rate": 0.0533
+   },
+   {
+    "seller_id": "99a54764c341d5dc80b4a8fac4eba3fb",
+    "delivered_cnt": 44,
+    "qc_cnt": 8,
+    "raw_rate": 0.1818,
+    "smooth_rate": 0.1135,
+    "benchmark_rate": 0.0533
+   },
+   {
+    "seller_id": "7040e82f899a04d1b434b795a43b4617",
+    "delivered_cnt": 90,
+    "qc_cnt": 13,
+    "raw_rate": 0.1444,
+    "smooth_rate": 0.1119,
+    "benchmark_rate": 0.0533
+   },
+   {
+    "seller_id": "18a349e75d307f4b4cc646a691ed4216",
+    "delivered_cnt": 91,
+    "qc_cnt": 13,
+    "raw_rate": 0.1429,
+    "smooth_rate": 0.1111,
+    "benchmark_rate": 0.0533
+   },
+   {
+    "seller_id": "c60b801f2d52c7f7f91de00870882a75",
+    "delivered_cnt": 37,
+    "qc_cnt": 7,
+    "raw_rate": 0.1892,
+    "smooth_rate": 0.1111,
+    "benchmark_rate": 0.0533
+   },
+   {
+    "seller_id": "966cb4760537b1404caedd472cc610a5",
+    "delivered_cnt": 67,
+    "qc_cnt": 10,
+    "raw_rate": 0.1493,
+    "smooth_rate": 0.1082,
+    "benchmark_rate": 0.0533
+   },
+   {
+    "seller_id": "855668e0971d4dfd7bef1b6a4133b41b",
+    "delivered_cnt": 77,
+    "qc_cnt": 11,
+    "raw_rate": 0.1429,
+    "smooth_rate": 0.1076,
+    "benchmark_rate": 0.0533
+   }
+  ],
+  "wrong": null
+ },
+ "Q13": {
+  "title": "数据核查：订单时间字段有没有脏数据",
+  "answer": [
+   {
+    "issue": "出库时间早于下单时间",
+    "orders": 166
+   },
+   {
+    "issue": "签收时间早于出库时间",
+    "orders": 23
+   },
+   {
+    "issue": "状态为已签收但没有签收时间",
+    "orders": 8
+   },
+   {
+    "issue": "状态不是已签收却有签收时间",
+    "orders": 6
+   },
+   {
+    "issue": "已签收但没有支付审核时间",
+    "orders": 14
+   },
+   {
+    "issue": "订单没有任何商品明细",
+    "orders": 775
+   },
+   {
+    "issue": "送达时长超过 60 天（疑似异常）",
+    "orders": 288
+   }
+  ],
+  "wrong": null
+ },
+ "Q14": {
+  "title": "对账：支付金额与商品金额 + 运费对不上的订单",
+  "answer": [
+   {
+    "order_id": "ce6d150fb29ada17d2082f4847107665",
+    "item_rows": 1,
+    "pay_rows": 1,
+    "item_amt": 1403.66,
+    "pay_amt": 1586.47,
+    "diff": 182.81
+   },
+   {
+    "order_id": "6e5fe7366a2e1bfbf3257dba0af1267f",
+    "item_rows": 6,
+    "pay_rows": 1,
+    "item_amt": 287.91,
+    "pay_amt": 406.92,
+    "diff": 119.01
+   },
+   {
+    "order_id": "70b742795bc441e94a44a084b6d9ce7a",
+    "item_rows": 1,
+    "pay_rows": 1,
+    "item_amt": 466.93,
+    "pay_amt": 578.82,
+    "diff": 111.89
+   },
+   {
+    "order_id": "996c7e73600ad3723e8627ab7bef81e4",
+    "item_rows": 1,
+    "pay_rows": 1,
+    "item_amt": 587.9,
+    "pay_amt": 664.43,
+    "diff": 76.53
+   },
+   {
+    "order_id": "70b7e94ea46d3e8b5bc12a50186edaf0",
+    "item_rows": 3,
+    "pay_rows": 1,
+    "item_amt": 213.15,
+    "pay_amt": 274.84,
+    "diff": 61.69
+   },
+   {
+    "order_id": "bc2c82b0ef78d2252b6176d1972db7c9",
+    "item_rows": 3,
+    "pay_rows": 1,
+    "item_amt": 242.01,
+    "pay_amt": 303.02,
+    "diff": 61.01
+   },
+   {
+    "order_id": "af9ffff2ce6b3defd34fd4c78857a379",
+    "item_rows": 1,
+    "pay_rows": 1,
+    "item_amt": 413.17,
+    "pay_amt": 466.97,
+    "diff": 53.8
+   },
+   {
+    "order_id": "262118ce178bb3e4590a3adcf6d62e6b",
+    "item_rows": 2,
+    "pay_rows": 1,
+    "item_amt": 177.74,
+    "pay_amt": 126.12,
+    "diff": -51.62
+   },
+   {
+    "order_id": "bfdb5bbb06458d600a33d61f5f287472",
+    "item_rows": 1,
+    "pay_rows": 1,
+    "item_amt": 348.93,
+    "pay_amt": 394.36,
+    "diff": 45.43
+   },
+   {
+    "order_id": "8d9c0dc8d5a2ce804f6b925d8f8e6c1d",
+    "item_rows": 2,
+    "pay_rows": 1,
+    "item_amt": 254.45,
+    "pay_amt": 293.89,
+    "diff": 39.44
+   }
+  ],
+  "wrong": [
+   {
+    "mismatched_orders": 12494
+   }
+  ]
+ },
+ "Q15": {
+  "title": "按评价日期连续 3 天都有品质客诉订单的商家（预警规则回溯）",
+  "answer": [
+   {
+    "seller_id": "2eb70248d66e0e3ef83659f71b244378",
+    "start_day": 1528156800000,
+    "end_day": 1528761600000,
+    "streak_days": 8
+   },
+   {
+    "seller_id": "955fee9216a65b617aa5c0531780ce60",
+    "start_day": 1516579200000,
+    "end_day": 1516924800000,
+    "streak_days": 5
+   },
+   {
+    "seller_id": "2eb70248d66e0e3ef83659f71b244378",
+    "start_day": 1532649600000,
+    "end_day": 1532995200000,
+    "streak_days": 5
+   },
+   {
+    "seller_id": "6560211a19b47992c3666cc44a7e94c0",
+    "start_day": 1532908800000,
+    "end_day": 1533254400000,
+    "streak_days": 5
+   },
+   {
+    "seller_id": "cc419e0650a3c5ba77189a1882b7556a",
+    "start_day": 1498262400000,
+    "end_day": 1498521600000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "7c67e1448b00f6e969d365cea6b010ab",
+    "start_day": 1501545600000,
+    "end_day": 1501804800000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "46dc3b2cc0980fb8ec44634e21d2718e",
+    "start_day": 1512864000000,
+    "end_day": 1513123200000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "1ca7077d890b907f89be8c954a02686a",
+    "start_day": 1515715200000,
+    "end_day": 1515974400000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "1ca7077d890b907f89be8c954a02686a",
+    "start_day": 1517616000000,
+    "end_day": 1517875200000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "710e3548e02bc1d2831dfc4f1b5b14d4",
+    "start_day": 1519689600000,
+    "end_day": 1519948800000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "4a3ca9315b744ce9f8e9374361493884",
+    "start_day": 1519862400000,
+    "end_day": 1520121600000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "1025f0e2d44d7041d6cf58b6550e0bfa",
+    "start_day": 1520640000000,
+    "end_day": 1520899200000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "7c67e1448b00f6e969d365cea6b010ab",
+    "start_day": 1522454400000,
+    "end_day": 1522713600000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "2eb70248d66e0e3ef83659f71b244378",
+    "start_day": 1533168000000,
+    "end_day": 1533427200000,
+    "streak_days": 4
+   },
+   {
+    "seller_id": "4a3ca9315b744ce9f8e9374361493884",
+    "start_day": 1495584000000,
+    "end_day": 1495756800000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "4a3ca9315b744ce9f8e9374361493884",
+    "start_day": 1500681600000,
+    "end_day": 1500854400000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "4a3ca9315b744ce9f8e9374361493884",
+    "start_day": 1501200000000,
+    "end_day": 1501372800000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "6560211a19b47992c3666cc44a7e94c0",
+    "start_day": 1505779200000,
+    "end_day": 1505952000000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "4a3ca9315b744ce9f8e9374361493884",
+    "start_day": 1508976000000,
+    "end_day": 1509148800000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "cca3071e3e9bb7d12640c9fbe2301306",
+    "start_day": 1509062400000,
+    "end_day": 1509235200000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "6560211a19b47992c3666cc44a7e94c0",
+    "start_day": 1509753600000,
+    "end_day": 1509926400000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "6560211a19b47992c3666cc44a7e94c0",
+    "start_day": 1510876800000,
+    "end_day": 1511049600000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "cc419e0650a3c5ba77189a1882b7556a",
+    "start_day": 1512691200000,
+    "end_day": 1512864000000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "1835b56ce799e6a4dc4eddc053f04066",
+    "start_day": 1512950400000,
+    "end_day": 1513123200000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "1f50f920176fa81dab994f9023523100",
+    "start_day": 1513036800000,
+    "end_day": 1513209600000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "cc419e0650a3c5ba77189a1882b7556a",
+    "start_day": 1513123200000,
+    "end_day": 1513296000000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "a1043bafd471dff536d0c462352beb48",
+    "start_day": 1513296000000,
+    "end_day": 1513468800000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "4a3ca9315b744ce9f8e9374361493884",
+    "start_day": 1513814400000,
+    "end_day": 1513987200000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "6560211a19b47992c3666cc44a7e94c0",
+    "start_day": 1515456000000,
+    "end_day": 1515628800000,
+    "streak_days": 3
+   },
+   {
+    "seller_id": "1ca7077d890b907f89be8c954a02686a",
+    "start_day": 1516492800000,
+    "end_day": 1516665600000,
+    "streak_days": 3
+   }
+  ],
+  "wrong": null
+ },
+ "Q16": {
+  "title": "各州送达时长的中位数和 P90",
+  "answer": [
+   {
+    "customer_state": "SP",
+    "orders": 23329,
+    "avg_days": 8.3,
+    "p50_days": 6.8,
+    "p90_days": 15.2
+   },
+   {
+    "customer_state": "RJ",
+    "orders": 6342,
+    "avg_days": 15.8,
+    "p50_days": 11.9,
+    "p90_days": 31.5
+   },
+   {
+    "customer_state": "MG",
+    "orders": 6079,
+    "avg_days": 11.9,
+    "p50_days": 9.9,
+    "p90_days": 21.2
+   },
+   {
+    "customer_state": "RS",
+    "orders": 2737,
+    "avg_days": 15.3,
+    "p50_days": 13.1,
+    "p90_days": 26.9
+   },
+   {
+    "customer_state": "PR",
+    "orders": 2711,
+    "avg_days": 11.6,
+    "p50_days": 9.9,
+    "p90_days": 20.2
+   },
+   {
+    "customer_state": "SC",
+    "orders": 1884,
+    "avg_days": 14.6,
+    "p50_days": 12.0,
+    "p90_days": 26.5
+   },
+   {
+    "customer_state": "BA",
+    "orders": 1726,
+    "avg_days": 19.1,
+    "p50_days": 16.7,
+    "p90_days": 32.3
+   },
+   {
+    "customer_state": "DF",
+    "orders": 1193,
+    "avg_days": 12.5,
+    "p50_days": 10.5,
+    "p90_days": 21.8
+   },
+   {
+    "customer_state": "ES",
+    "orders": 1047,
+    "avg_days": 16.2,
+    "p50_days": 14.0,
+    "p90_days": 26.4
+   },
+   {
+    "customer_state": "GO",
+    "orders": 1033,
+    "avg_days": 15.2,
+    "p50_days": 13.5,
+    "p90_days": 24.7
+   }
+  ],
+  "wrong": null
+ },
+ "Q17": {
+  "title": "临时明细导出：某品类某月的中差评明细",
+  "answer": [
+   {
+    "order_id": "00b6e66f005a657a6b13eedcacdf9342",
+    "purchase_date": 1533945600000,
+    "review_score": 1,
+    "sellers": "53243585",
+    "item_rows": 2,
+    "review_comment_title": "ENTREGA DESASTROSA",
+    "review_comment_message": "Comprei 2 (dois) Tablet Qbex Zupin TX120 7\" 4GB Dual Core Android 4.2 Preto e recebi apenas 1 (um). A nota fiscal apresenta 2 unidades, mas na caixa lacrada só havia 1 (um). Me considero roubado."
+   },
+   {
+    "order_id": "0cf8068e7b7318f0e518be23c903b9f2",
+    "purchase_date": 1533340800000,
+    "review_score": 1,
+    "sellers": "53243585",
+    "item_rows": 1,
+    "review_comment_title": "N foi entregue ainda ",
+    "review_comment_message": "Demora de entrega"
+   },
+   {
+    "order_id": "13cef9e0a4505f2d911e9c4465b5eb22",
+    "purchase_date": 1534809600000,
+    "review_score": 1,
+    "sellers": "2138ccb8",
+    "item_rows": 1,
+    "review_comment_title": "Pessima",
+    "review_comment_message": "made in china com etiqueta enorme escrita....msm marca e padrão do produto vendido em minha cidade que por sinal adquiri pro aparelho anterior...conclusão? Paguei + que o dobro por algo de camelodromo"
+   },
+   {
+    "order_id": "26d9a2f9a41aeeb0b0dd16ac2ca59225",
+    "purchase_date": 1533081600000,
+    "review_score": 1,
+    "sellers": "53243585",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": null
+   },
+   {
+    "order_id": "30524d6f42cc124d17d641b49e792b87",
+    "purchase_date": 1533427200000,
+    "review_score": 1,
+    "sellers": "18a349e7",
+    "item_rows": 1,
+    "review_comment_title": "Produto com defeito",
+    "review_comment_message": "\r\nComprei um produto que está com defeito e não consigo trocar da erro no site."
+   },
+   {
+    "order_id": "451a92b9b2211031e527f7f85525388c",
+    "purchase_date": 1533340800000,
+    "review_score": 1,
+    "sellers": "b76dba6c",
+    "item_rows": 1,
+    "review_comment_title": "Carregador com defeito",
+    "review_comment_message": "Carregador com defeito e a loja se recusa a efetuar a troca."
+   },
+   {
+    "order_id": "64c8d713a96944349d954eb4bd62e6d5",
+    "purchase_date": 1533859200000,
+    "review_score": 1,
+    "sellers": "7040e82f",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": "O produto veio com defeito"
+   },
+   {
+    "order_id": "69aa7c6140efd63150254b0fb1340fc9",
+    "purchase_date": 1533254400000,
+    "review_score": 1,
+    "sellers": "53243585",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": "o produto não foi entregue, foi pelo correio e não receberam no local. Não consigo falar na loja para resolver"
+   },
+   {
+    "order_id": "6ea09ab8953f7fda1f69d387c9d252eb",
+    "purchase_date": 1533945600000,
+    "review_score": 1,
+    "sellers": "2138ccb8,ea8482cd",
+    "item_rows": 2,
+    "review_comment_title": null,
+    "review_comment_message": "o produto chegou incompleto! \r\nNão consigo contato nem com a lojas lannister nem com o telefone que veio na nota.\r\nGostaria de resolver isso o mais rápido possível!"
+   },
+   {
+    "order_id": "724074e91e873f7bba4b3548c59e5f92",
+    "purchase_date": 1534982400000,
+    "review_score": 1,
+    "sellers": "2138ccb8",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": "O produto chegou quebrado"
+   },
+   {
+    "order_id": "7737b48ac906ed0be3c192bb1fc4c4ef",
+    "purchase_date": 1533600000000,
+    "review_score": 1,
+    "sellers": "53243585",
+    "item_rows": 1,
+    "review_comment_title": "Não recebi meu produto",
+    "review_comment_message": "Não gostei da demora e nem dei satisfação de onde está o produto"
+   },
+   {
+    "order_id": "7a12712273a3da7417b25f9108162305",
+    "purchase_date": 1533513600000,
+    "review_score": 1,
+    "sellers": "53243585",
+    "item_rows": 1,
+    "review_comment_title": "Prazo de entrega",
+    "review_comment_message": "Comprei o produto no dia 6/8 e no dia 17/8 ainda não tinha sido entregue."
+   },
+   {
+    "order_id": "7ab8357ecb12f6b03ee66996c0250c6d",
+    "purchase_date": 1533254400000,
+    "review_score": 1,
+    "sellers": "53243585",
+    "item_rows": 1,
+    "review_comment_title": "Produto Usado",
+    "review_comment_message": "Tablet chegou com a tela toda arranhada, todo zuado, um monte de aplicativos baixados. Comprei novo veio usado. Já solicitei devolução estou aguardando "
+   },
+   {
+    "order_id": "873c916c2bff3ea61a59f7bf7f0879c2",
+    "purchase_date": 1533513600000,
+    "review_score": 1,
+    "sellers": "53243585",
+    "item_rows": 2,
+    "review_comment_title": "Tablet",
+    "review_comment_message": "Recebi o produto usado estou tentando trocar porém sem êxito."
+   },
+   {
+    "order_id": "8b75c1d5d99e30c53acf26bdfd1f29bc",
+    "purchase_date": 1533513600000,
+    "review_score": 1,
+    "sellers": "ea8482cd",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": null
+   },
+   {
+    "order_id": "8c48a29935d95dd45daa77ac63f6786d",
+    "purchase_date": 1534982400000,
+    "review_score": 1,
+    "sellers": "8a43128d",
+    "item_rows": 1,
+    "review_comment_title": "nao recomendo",
+    "review_comment_message": "Produto veio com defeito"
+   },
+   {
+    "order_id": "8cb4af66a9f35f0578f7fe7f325bb06b",
+    "purchase_date": 1533686400000,
+    "review_score": 1,
+    "sellers": "bff9deb0",
+    "item_rows": 1,
+    "review_comment_title": "Produto ERRADO",
+    "review_comment_message": "O conector USB que entregaram é diferente do que foi anunciado, que me interessou e por isso o comprei. O que enviaram NÃO serve em meu celular. Requeiro a troca imediata."
+   },
+   {
+    "order_id": "ae2fb0f5aec36b2a6b058602dc941fb1",
+    "purchase_date": 1533168000000,
+    "review_score": 1,
+    "sellers": "b76dba6c",
+    "item_rows": 1,
+    "review_comment_title": "Carregador LG com defeito",
+    "review_comment_message": "Boa noite,\r\nRecebi ontem o produto que, infelizmente, não funciona (não carrega a bateria do meu celular LG).\r\nTentei acessar o canal de reclamações de lannister.com, mas não consegui. Fiz mau negóci"
+   },
+   {
+    "order_id": "c8e84603674d71b14595773f1374773d",
+    "purchase_date": 1533772800000,
+    "review_score": 1,
+    "sellers": "b76dba6c",
+    "item_rows": 1,
+    "review_comment_title": "Media",
+    "review_comment_message": null
+   },
+   {
+    "order_id": "cb4d0ce750b3542055ae832b4d3bcca4",
+    "purchase_date": 1535241600000,
+    "review_score": 1,
+    "sellers": "2138ccb8",
+    "item_rows": 2,
+    "review_comment_title": "Entrega errada ",
+    "review_comment_message": "Fiz a solicitação de devolução, pois comprei a película para o zenfone 5 selfie e veio o do zenfone 4"
+   },
+   {
+    "order_id": "d24b90d375b1415ca40e5b531d04a6bf",
+    "purchase_date": 1533254400000,
+    "review_score": 1,
+    "sellers": "2138ccb8",
+    "item_rows": 1,
+    "review_comment_title": "Horrivel ",
+    "review_comment_message": "Olha meu produto veio com defeito,ai mandei para garantia e a garantia veio com defeito tambem."
+   },
+   {
+    "order_id": "ecc1f5f885620b17543f01bf228ccd0a",
+    "purchase_date": 1533168000000,
+    "review_score": 1,
+    "sellers": "b76dba6c",
+    "item_rows": 1,
+    "review_comment_title": "Carregador não funciona ",
+    "review_comment_message": "Desapontada com o serviço de compra pela internet das lannister. o carregador não pega em nenhum celular "
+   },
+   {
+    "order_id": "f5c5f55feb6cefec984e26efbe2a130b",
+    "purchase_date": 1533600000000,
+    "review_score": 1,
+    "sellers": "53243585",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": null
+   },
+   {
+    "order_id": "fe94f63f2f4d326a6da25bfe07ffaf93",
+    "purchase_date": 1533168000000,
+    "review_score": 1,
+    "sellers": "b76dba6c",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": "Recebi o carregador, mas ele veio com defeito. Não está carregando o celular. Como realizo a troca?"
+   },
+   {
+    "order_id": "256c2127e05b924a7cbf69f95e3c4830",
+    "purchase_date": 1534204800000,
+    "review_score": 2,
+    "sellers": "7d76b645",
+    "item_rows": 1,
+    "review_comment_title": "Película não é de gel",
+    "review_comment_message": "A pelicula que informam como sendo de gel no anúncio na verdade é uma película comum de plástico. "
+   },
+   {
+    "order_id": "2aee9216e013859db72c7eae0a7dadc1",
+    "purchase_date": 1533859200000,
+    "review_score": 2,
+    "sellers": "240b9776",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": null
+   },
+   {
+    "order_id": "3016aab208504e35592823875a18d588",
+    "purchase_date": 1533168000000,
+    "review_score": 2,
+    "sellers": "53243585",
+    "item_rows": 1,
+    "review_comment_title": "Urgência",
+    "review_comment_message": "Tinha urgência em receber o produto para dar o presente no dia dos pais, mas não chegou no prazo e não tem nada dizendo o porque da falha na entrega do produto."
+   },
+   {
+    "order_id": "91681be83015c5760383644518e80ec6",
+    "purchase_date": 1533686400000,
+    "review_score": 2,
+    "sellers": "53243585",
+    "item_rows": 1,
+    "review_comment_title": "Razoável",
+    "review_comment_message": "Apenas a imagem das fotos é muito ruim. O restante é bom."
+   },
+   {
+    "order_id": "9702b284912de5c57518af9f8220246c",
+    "purchase_date": 1533254400000,
+    "review_score": 2,
+    "sellers": "ef506c96",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": null
+   },
+   {
+    "order_id": "ad01e26d29b4818ba6299d1356a130b7",
+    "purchase_date": 1534032000000,
+    "review_score": 2,
+    "sellers": "7202e2ba",
+    "item_rows": 1,
+    "review_comment_title": null,
+    "review_comment_message": "Veio com um amassado pequeno na tampa da bateria! Nao reclamei pois iriam alegar que foi mal manuseado... dificilmente iriam me repor. NAO quis comprar a briga!"
+   }
+  ],
+  "wrong": null
+ },
+ "Q18": {
+  "title": "口径对不上：看板上 2018-03 的品质客诉率 vs 业务方自己算的数",
+  "answer": [
+   {
+    "caliber": "A 按下单月（看板口径）",
+    "qc_cnt": 348,
+    "delivered": 7003,
+    "qc_rate": 0.0497
+   },
+   {
+    "caliber": "B 分子按评价月 / 分母按签收月",
+    "qc_cnt": 358,
+    "delivered": 6824,
+    "qc_rate": 0.0525
+   }
+  ],
+  "wrong": null
+ },
+ "Q19": {
+  "title": "小品类月度报表：没有订单的月份也要显示 0",
+  "answer": [
+   {
+    "category_cn": "电脑整机",
+    "month": "2018-01",
+    "delivered_cnt": 11,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "电脑整机",
+    "month": "2018-02",
+    "delivered_cnt": 0,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "电脑整机",
+    "month": "2018-03",
+    "delivered_cnt": 0,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "电脑整机",
+    "month": "2018-04",
+    "delivered_cnt": 13,
+    "qc_cnt": 1
+   },
+   {
+    "category_cn": "电脑整机",
+    "month": "2018-05",
+    "delivered_cnt": 6,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "电脑整机",
+    "month": "2018-06",
+    "delivered_cnt": 8,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "电脑整机",
+    "month": "2018-07",
+    "delivered_cnt": 8,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "电脑整机",
+    "month": "2018-08",
+    "delivered_cnt": 10,
+    "qc_cnt": 2
+   },
+   {
+    "category_cn": "空调冷暖",
+    "month": "2018-01",
+    "delivered_cnt": 22,
+    "qc_cnt": 1
+   },
+   {
+    "category_cn": "空调冷暖",
+    "month": "2018-02",
+    "delivered_cnt": 11,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "空调冷暖",
+    "month": "2018-03",
+    "delivered_cnt": 23,
+    "qc_cnt": 1
+   },
+   {
+    "category_cn": "空调冷暖",
+    "month": "2018-04",
+    "delivered_cnt": 22,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "空调冷暖",
+    "month": "2018-05",
+    "delivered_cnt": 13,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "空调冷暖",
+    "month": "2018-06",
+    "delivered_cnt": 9,
+    "qc_cnt": 2
+   },
+   {
+    "category_cn": "空调冷暖",
+    "month": "2018-07",
+    "delivered_cnt": 15,
+    "qc_cnt": 1
+   },
+   {
+    "category_cn": "空调冷暖",
+    "month": "2018-08",
+    "delivered_cnt": 17,
+    "qc_cnt": 1
+   },
+   {
+    "category_cn": "艺术品",
+    "month": "2018-01",
+    "delivered_cnt": 19,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "艺术品",
+    "month": "2018-02",
+    "delivered_cnt": 11,
+    "qc_cnt": 2
+   },
+   {
+    "category_cn": "艺术品",
+    "month": "2018-03",
+    "delivered_cnt": 7,
+    "qc_cnt": 1
+   },
+   {
+    "category_cn": "艺术品",
+    "month": "2018-04",
+    "delivered_cnt": 26,
+    "qc_cnt": 0
+   },
+   {
+    "category_cn": "艺术品",
+    "month": "2018-05",
+    "delivered_cnt": 33,
+    "qc_cnt": 1
+   },
+   {
+    "category_cn": "艺术品",
+    "month": "2018-06",
+    "delivered_cnt": 28,
+    "qc_cnt": 4
+   },
+   {
+    "category_cn": "艺术品",
+    "month": "2018-07",
+    "delivered_cnt": 21,
+    "qc_cnt": 1
+   },
+   {
+    "category_cn": "艺术品",
+    "month": "2018-08",
+    "delivered_cnt": 18,
+    "qc_cnt": 0
+   }
+  ],
+  "wrong": null
+ }
+}

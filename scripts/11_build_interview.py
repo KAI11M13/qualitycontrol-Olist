@@ -9,12 +9,13 @@
   docs/05_SQL面试题库.md                  答案版（口径 / SQL / 实跑结果 / 自检 / 错误写法 / 追问）
   docs/05_SQL面试题_练习版.md             题目版（只有业务原话、用表提示、输出要求）
 """
+import json
 import re
 import time
 
 import pandas as pd
 
-from common import ROOT, connect
+from common import OUT_DIR, ROOT, connect
 from complaint_rules import tag_text
 from interview_questions import Q
 
@@ -23,17 +24,17 @@ OUT_SQL = ROOT / "sql" / "interview"
 
 TABLES = [
     # 面试库表名, 来源, 主键/索引, 一行代表什么
-    ("orders", "vip_qc.ods_orders", "PRIMARY KEY (order_id), KEY (customer_id)", "一个订单"),
-    ("order_items", "vip_qc.ods_order_items", "PRIMARY KEY (order_id, order_item_id), KEY (product_id), KEY (seller_id)",
+    ("orders", "qc_dw.ods_orders", "PRIMARY KEY (order_id), KEY (customer_id)", "一个订单"),
+    ("order_items", "qc_dw.ods_order_items", "PRIMARY KEY (order_id, order_item_id), KEY (product_id), KEY (seller_id)",
      "订单里的一个商品行（同一商品买 2 件 = 2 行）"),
-    ("order_reviews", "vip_qc.ods_order_reviews", "PRIMARY KEY (review_id, order_id), KEY (order_id)",
+    ("order_reviews", "qc_dw.ods_order_reviews", "PRIMARY KEY (review_id, order_id), KEY (order_id)",
      "一条评价（⚠ 同一订单可能有多条）"),
-    ("order_payments", "vip_qc.ods_order_payments", "PRIMARY KEY (order_id, payment_sequential)", "一笔支付（组合支付一单多行）"),
-    ("products", "vip_qc.ods_products", "PRIMARY KEY (product_id)", "一个商品（⚠ 610 个商品缺品类）"),
-    ("sellers", "vip_qc.ods_sellers", "PRIMARY KEY (seller_id)", "一个商家"),
-    ("customers", "vip_qc.ods_customers", "PRIMARY KEY (customer_id), KEY (customer_unique_id)",
+    ("order_payments", "qc_dw.ods_order_payments", "PRIMARY KEY (order_id, payment_sequential)", "一笔支付（组合支付一单多行）"),
+    ("products", "qc_dw.ods_products", "PRIMARY KEY (product_id)", "一个商品（⚠ 610 个商品缺品类）"),
+    ("sellers", "qc_dw.ods_sellers", "PRIMARY KEY (seller_id)", "一个商家"),
+    ("customers", "qc_dw.ods_customers", "PRIMARY KEY (customer_id), KEY (customer_unique_id)",
      "⚠ 一个订单对应一个 customer_id；自然人是 customer_unique_id"),
-    ("category_dim", "vip_qc.dim_category", "PRIMARY KEY (product_category_name)", "一个品类（葡语名 → 中文名 → 一级类目）"),
+    ("category_dim", "qc_dw.dim_category", "PRIMARY KEY (product_category_name)", "一个品类（葡语名 → 中文名 → 一级类目）"),
 ]
 
 SCHEMA_DOC = """| 表 | 一行代表 | 主键 | 关键字段 |
@@ -141,6 +142,8 @@ def main():
     build_db()
     conn = connect(db=DB)
     results = []
+    for old in OUT_SQL.glob("Q[0-9]*.sql"):  # 题目改名后不留旧文件
+        old.unlink()
     for q in Q:
         t0 = time.time()
         ans = run(conn, q["sql"])
@@ -163,6 +166,11 @@ def main():
     conn.close()
     fails = [r for r in results if not r["ok"] or (r["cross"] is not None and not bool(r["cross"].ok.iloc[0]))]
     write_docs(results)
+    # PPT / 报告引用的"错误写法 vs 正确写法"数字从这里取，不手抄
+    rec = lambda df: None if df is None else json.loads(df.head(30).to_json(orient="records", force_ascii=False))
+    (OUT_DIR / "sql_results.json").write_text(json.dumps(
+        {r["q"]["id"]: {"title": r["q"]["title"], "answer": rec(r["ans"]), "wrong": rec(r["wrong"])} for r in results},
+        ensure_ascii=False, indent=1), encoding="utf-8")
     if fails:
         raise SystemExit(f"{len(fails)} 道题自检未通过")
     print(f"\n{len(results)}/{len(results)} 道题全部实跑通过 → docs/05_SQL面试题库.md")
@@ -178,7 +186,7 @@ def write_docs(results):
     full = [
         "# 05 SQL 面试题库：品控业务临时取数",
         "",
-        "> 对应 JD 职责 4：**响应业务部门的临时取数需求，编写 SQL 提取原始数据，并进行基础的清洗和加工，支撑各业务决策。**",
+        "> 模块④ SQL 取数：响应业务方的临时取数需求，编写 SQL 提取原始数据，并做基础的清洗和加工。术语与口径以 [00_术语与口径.md](00_术语与口径.md) 为准。",
         ">",
         "> 每道题都从**业务方原话**出发，要求先把\"业务语言\"翻译成\"数据口径\"，再写 SQL、做自检。"
         "全部答案在 MySQL 8.0 的面试库 `qc_interview` 上实际执行过，下方的结果预览就是真实运行结果；"
@@ -249,7 +257,7 @@ def write_docs(results):
                 q["sql"],
                 "```",
                 "",
-                f"**实跑结果**（共 {len(r['ans'])} 行{'，展示前 10 行' if len(r['ans']) > 10 else ''}；耗时 {r['ms']:.0f} ms）",
+                f"**实跑结果**（共 {len(r['ans'])} 行{'，展示前 10 行' if len(r['ans']) > 10 else ''}）",
                 "",
                 md_table(r["ans"]),
                 "",

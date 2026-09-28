@@ -30,8 +30,8 @@ def main() -> None:
                     order_id CHAR(32) PRIMARY KEY,
                     review_id CHAR(32),
                     {flag_cols},
-                    primary_tag VARCHAR(20) NULL COMMENT '按优先级取的主问题类型'
-                ) COMMENT 'DWD-评价文本问题类型打标（多标签+主标签）'"""
+                    primary_tag VARCHAR(20) NULL COMMENT '按优先级取的主标签'
+                ) COMMENT 'DWD-评价文字标签（多标签 + 主标签）'"""
             )
             cols = ["order_id", "review_id"] + TAG_CODES + ["primary_tag"]
             sql = (
@@ -48,7 +48,7 @@ def main() -> None:
                 """CREATE TABLE dim_complaint_rule (
                     tag_code VARCHAR(20) PRIMARY KEY, tag_name VARCHAR(32), tag_group VARCHAR(16),
                     priority INT, regex_rule TEXT
-                ) COMMENT 'DIM-客诉问题类型字典（打标规则）'"""
+                ) COMMENT 'DIM-标签字典（识别规则）'"""
             )
             cur.executemany("INSERT INTO dim_complaint_rule VALUES (%s,%s,%s,%s,%s)", RULES)
     finally:

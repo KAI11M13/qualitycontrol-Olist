@@ -1,32 +1,35 @@
-# 电商品控数据分析项目
+# 电商品控数据分析项目：差评率在下降，品质客诉率在上升
 
-差评在降，品质客诉在升
+用 Olist 巴西电商平台公开的真实订单数据，搭建以**品质客诉率**为核心指标的品控分析，包括四个模块：指标体系、经营看板、专题分析、SQL 取数。
 
-用 Olist 巴西电商平台公开的约 10 万笔**真实订单**，按 JD 的四项职责做了四件可交付的东西：品控指标体系、经营看板、专题分析、SQL 取数题库。
+> **品质客诉率** = 品质客诉订单数 ÷ 签收订单数（分子、分母按同一下单月归属）；品质客诉订单 = 签收订单中，最后一次评价为 1-3 星、且评价文字命中至少一个品质问题标签（假货、质量缺陷、货不对板、少件漏发、包装破损）的订单。全部术语、定义和数字格式见 [docs/00_术语与口径.md](docs/00_术语与口径.md)：一个概念只有一个名称，一个名称只有一个定义。
 
-![看板总览](<img width="1919" height="859" alt="image" src="https://github.com/user-attachments/assets/2e53dd9b-dff8-4f43-b590-17ca9477d462" />
-)
+![看板总览](docs/images/dashboard_overview_top.png)
 
 ## 核心结论
 
-- **差评率由物流主导，不能用来评价品控**：2018 年 3 月准时签收率跌到 81.0%，差评率冲到 22.8%；物流恢复后 8 月回落到 10.9%。
-- **品质客诉率在上升，且不是随机波动**：2017 年 4.31% → 2018 年 1-8 月 5.00%（两比例 z 检验 p < 0.0001；p 控制图上自 2017 年 10 月起连续 11 个月高于基线）；差评中品质问题的占比从 22% 升到 35%。因素分解显示上升全部来自同类订单变差（组内效应 +0.74pp，结构效应 −0.01pp），增长最快的是货不对板（+33%）和假货（+83%）。
-- **三个瓶颈**：多件订单占 10% 签收单、贡献 34% 品质客诉（几乎都是少件漏发）；10 家高风险商家占 3.6% 订单、贡献 12.5% 客诉；办公家具少配件、3C / 钟表假货、信息缺失商品风险高。
-- **放到唯品会的品类结构下**：穿戴类品质客诉率涨得更快（3.7% → 5.1%）；按唯品会穿戴类约 75% 的结构重新加权，假货投诉从每万单 22 翻倍到 45。
-- **治理测算**：多件订单出库复核、高风险商家整改、3C / 钟表正品专项，三项叠加中性情景可把品质客诉率从 5.00% 降到 3.82%（三档情景 3.34%–4.32%）。高风险商家名单经过回测：下一期客诉率仍是平台的 2.2 倍。
+- **结论**：差评率在下降，品质客诉率在上升，而且是持续偏移。品质客诉率从 2017 年的 4.31% 升到 2018 年 1-8 月的 5.00%（两比例 z 检验 z = 5.05，p < 0.0001），控制图上 2017-10 至 2018-08 连续 11 个月高于中心线；差评率随准时签收率变化：下单月 2018-03 准时签收率 81.0%、差评率 22.8%，2018-08 为 93.8% 和 10.9%。
+- **原因**：上升来自组内效应（+0.74pp），结构效应只有 −0.01pp；差评品质原因占比从 2017Q1 的 21.9% 升到 2018Q3 的 35.2%。
+- **问题**：多件订单占签收订单 10.0%，贡献 33.6% 的品质客诉订单；10 家高风险商家贡献 12.5% 的商家品质客诉订单，回测中下一个 6 个月仍是商家基准品质客诉率的 2.2 倍；假货集中在电脑配件（66.2 单/万单）和钟表礼品（53.0 单/万单）。
+- **举措**：多件订单出库复核、高风险商家和需关注商家整改、一级类目 3C数码、钟表与潮流好物的正品与商品描述专项，中性情景下把品质客诉率从 5.00% 降到 3.82%（悲观 4.32%，乐观 3.34%）。
+- **可信度**：18 项数据校验全部通过；标注样本 200 条，标签精确率 97.4%、标签召回率 74.5%，2017 年与 2018 年标签召回率相近，上升趋势不会被高估。
 
 ## 交付物
 
-| JD 职责 | 交付物 | 位置 |
+| 模块 | 交付物 | 位置 |
 |---|---|---|
-| ① 指标体系建设 | 北极星 + 31 个指标、6 条口径约定、口径变更记录；基准值由口径 SQL 实跑得到 | [指标体系说明](docs/02_指标体系.md) · [指标字典.xlsx](docs/品控指标字典.xlsx) |
-| ② 可视化看板 | 3 页交互看板（总览 / 商家风险 / 指标口径，趋势图带 p 控制图控制限）；Power BI、Tableau、SmartBI 搭建指南；Tableau Public 逐步搭建清单 | [dashboard/index.html](dashboard/index.html)（本地双击打开）· [搭建指南](docs/04_BI看板设计与搭建指南.md) · [Tableau Public 清单](docs/07_Tableau_Public搭建清单.md) · [BI 导入数据](dashboard/bi_data/) |
-| Excel 报表 | 商家品质月报模板：改参数页的月份和阈值，SUMIFS / INDEX-MATCH 公式自动重算商家分层，附透视表和条件格式；分层结果与数仓评分卡逐一对账 | [商家品质月报模板.xlsx](docs/商家品质月报模板.xlsx) |
-| ③ 专题分析 | 假设驱动的分析报告（Word + Markdown）、24 页汇报 PPT（20 页正文 + 4 页附录，原生图表 + 讲稿备注）；进阶分析：控制图、显著性检验、商家分层回测、三档情景与敏感性、差异化抽检增益曲线、唯品会品类视角 | [报告.docx](report/品控专题分析报告.docx) · [报告.md](docs/03_专题分析报告.md) · [PPT](ppt/品控数据分析项目_面试汇报.pptx) · [进阶分析明细](outputs/advanced_tables.xlsx) |
-| ④ 取数与 SQL | 19 道业务取数题：业务原话 → 口径 → SQL → 自检 → 错误写法对比 → 追问，全部在 MySQL 8.0 实跑 | [题库（答案版）](docs/05_SQL面试题库.md) · [练习版](docs/05_SQL面试题_练习版.md) · [SQL 文件](sql/interview/) |
-| 数据核查 | 数据说明与清洗规则、18 项自动校验；评价打标两轮评估：分层抽样 140 条看准确率，随机 200 条盲评看准确率 + 召回率（97.4% / 74.5%） | [数据说明](docs/01_数据说明与清洗规则.md) · [校验报告](outputs/qa/dq_report.md) · [分层复核样本](outputs/qa/tag_validation_sample.csv) · [随机金标准集](outputs/qa/tag_gold_set.csv) |
-| 外部参考 | 市场监管总局电商抽检结果、唯品会品类结构（来自新闻转载与财报报道，附出处） | [data/external/](data/external/) |
-| 面试准备 | JD 对照表、三分钟陈述稿、演示顺序、追问与回答要点（含控制图、召回率、回测、抽检、唯品会视角） | [面试讲述与问答准备](docs/06_面试讲述与问答准备.md) |
+| 术语与口径 | 核心概念拆解、四层指标、全部术语定义、数字格式、不再使用的叫法；自动检查所有产出 | [00_术语与口径.md](docs/00_术语与口径.md) · [tests/test_terminology.py](tests/test_terminology.py) |
+| ① 指标体系 | 31 个指标（核心指标、结果指标、体验指标、过程指标四层）、六条口径规则、口径变更记录；基准值由口径 SQL 实际运行得到 | [指标体系说明](docs/02_指标体系.md) · [指标字典.xlsx](docs/品控指标字典.xlsx) |
+| ② 经营看板 | 3 页交互看板（经营总览 / 商家分层 / 指标口径）：第一屏有控制图和预警清单；Power BI、Tableau、SmartBI 搭建指南；Tableau Public 逐步搭建清单 | [dashboard/index.html](dashboard/index.html)（本地双击打开）· [搭建指南](docs/04_BI看板设计与搭建指南.md) · [Tableau Public 清单](docs/07_Tableau_Public搭建清单.md) · [BI 导入数据](dashboard/bi_data/) |
+| Excel 报表 | 商家品质月报模板：改参数页的月份和阈值，SUMIFS / INDEX-MATCH 公式自动重算商家分层，附数据透视表和条件格式；商家分层结果与数仓逐一核对 | [商家品质月报模板.xlsx](docs/商家品质月报模板.xlsx) |
+| ③ 专题分析 | 分析报告（Word + Markdown）、25 页完整版 PPT（21 页正文 + 4 页附录）与 6 页精简版；控制图、显著性检验、商家分层回测、三组情景、差异化抽检、品类结构重加权 | [报告.docx](report/品控专题分析报告.docx) · [报告.md](docs/03_专题分析报告.md) · [完整版 PPT](ppt/品控数据分析项目_面试汇报.pptx) · [精简版 PPT](ppt/品控数据分析项目_面试汇报_精简版.pptx) · [分析明细](outputs/advanced_tables.xlsx) |
+| ④ SQL 取数 | 19 道业务取数题：业务原话 → 口径 → SQL → 自检 → 错误写法对比 → 追问，全部在 MySQL 8.0 实际运行 | [题库（答案版）](docs/05_SQL面试题库.md) · [练习版](docs/05_SQL面试题_练习版.md) · [SQL 文件](sql/interview/) |
+| Hive / Spark SQL | 5 道题按 Hive 分区表重写，在 Spark 4.0 + Hive Metastore 上运行，与 MySQL 结果逐行核对；分区裁剪、数据倾斜、小文件都有实际运行的演示 | [HiveQL 与 Spark SQL 版本](docs/08_HiveQL与SparkSQL版本.md) · [HQL 文件](sql/hive/) |
+| 笔试模拟 | 45 分钟 / 100 分的 SQL 笔试卷，6 道新题，附评分点、实际运行结果和常见扣分写法 | [试卷](docs/09_SQL笔试模拟卷.md) · [答案与评分](docs/09_SQL笔试模拟卷_答案与评分.md) |
+| 数据核查 | 数据说明与处理方式、18 项数据校验；标注样本评估（标签精确率 97.4%、标签召回率 74.5%） | [数据说明](docs/01_数据说明与清洗规则.md) · [校验报告](outputs/qa/dq_report.md) · [标注样本](outputs/qa/tag_gold_set.csv) |
+| 讲稿与问答 | 1 分钟版、5 分钟版讲稿（每部分：关键术语 → 结论 → 依据 → 动作，每个数字附定义）；能力与证据对照、演示顺序、追问与回答 | [面试讲稿](docs/10_面试讲稿.md) · [问答准备](docs/06_面试讲述与问答准备.md) |
+| 外部参考 | 市场监管总局抽查结果、穿戴类 GMV 占比（来自公告、新闻转载与财报报道，附出处） | [data/external/](data/external/) |
+| 工程化 | 单元测试（标签规则、标注样本回归、统计检验、Hive 对账、术语检查）；GitHub Actions 每次推送在干净环境里从原始数据重跑全流程；Docker 一键复现 | [tests/](tests/) · [CI 配置](.github/workflows/ci.yml) · [Dockerfile](Dockerfile) |
 
 ## 方法概览
 
@@ -34,21 +37,29 @@
 Olist 原始 CSV（8 张表，行数与官方一致）
    │  scripts/01_load_ods.py
    ▼
-ODS 贴源层 ──► DWD 明细层（评价去重、订单宽表、时间倒挂打标）
-                 │  scripts/03_tag_reviews.py：葡语评价 → 8 类问题标签（随机盲评：准确率 97%、召回率 75%）
+ODS 原始数据层 ──► DWD 明细层（只取最后一次评价、时间倒挂标记、主品类 / 主商家归属）
+                 │  scripts/03_tag_reviews.py：葡语评价文字 → 8 个标签（标签精确率 97.4%、标签召回率 74.5%）
                  ▼
-             dwd_qc_order 品控宽表（一单一行，所有指标的唯一口径来源）
+             dwd_qc_order 订单宽表（每个订单一行，所有指标都从这里计算）
                  ▼
-             DWS 商家×月 / 品类×月（只存计数）──► ADS 月度 KPI / 商家品质分 / 品类排行 / 看板数据集
-                 │  scripts/07_data_quality_check.py：18 项校验，全部通过才出数
+             DWS 商家 × 月 / 品类 × 月（只存订单数）──► ADS 月度核心指标 / 商家品质分与商家分层 / 品类排行 / 看板数据集
+                 │  scripts/07_data_quality_check.py：18 项数据校验，全部通过才输出结果
                  ▼
-   专题分析（08）· 指标字典（09）· 看板（10）· SQL 题库（11）
-   进阶分析（13）· 打标金标准评估（14）· Excel 月报模板（15）· PPT / 报告（12 + Node）
+   专题分析（08）· 指标字典（09）· 看板（10）· SQL 题库（11）· 笔试模拟卷（17）· Hive 版对账（16）
+   进阶分析（13）· 标注样本评估（14）· Excel 月报模板（15）· PPT / 报告 / 讲稿（12 + Node）
 ```
 
 ## 复现
 
-需要 MySQL 8.0、Python 3.10+、Node 18+；生成 Excel 模板的透视表需要 LibreOffice（`soffice`）。
+**方式一：Docker（推荐，本机只需要装 Docker）**
+
+```bash
+docker compose up --build     # 启动 MySQL 8.0 → 单元测试 → 全流程 17 步 → 生成 PPT / 报告 / 讲稿，结果写回本目录
+```
+
+**方式二：本机运行**
+
+需要 MySQL 8.0、Python 3.10+、Node 18+；生成 Excel 模板的数据透视表需要 LibreOffice（`soffice`）；Hive 版对账需要 Java 17+ 和 `pip install -r requirements-hive.txt`（没装 pyspark 时这一步自动跳过）。
 
 ```bash
 pip install -r requirements.txt
@@ -56,10 +67,11 @@ pip install -r requirements.txt
 # MySQL 连接参数通过环境变量设置（默认 localhost:3306，账号 analyst/analyst）
 export MYSQL_USER=... MYSQL_PASSWORD=...
 
-python scripts/run_pipeline.py          # 入库 → 数仓 → 打标 → 校验 → 分析 → 字典 → 看板 → 题库 → 进阶分析 → 金标准评估 → Excel 模板
+python scripts/run_pipeline.py          # 入库 → 数仓 → 标签 → 校验 → 分析 → 字典 → 看板 → 题库 → 笔试卷 → Hive 对账 → 进阶分析 → 标注样本评估 → Excel 模板
 
-cd ppt && npm install && node build_deck.js          # 生成 PPT
-cd ../report && npm install && node build_report.js  # 生成 Word 报告
+cd ppt && npm install && node build_deck.js && node build_deck_short.js && node build_talk.js   # PPT（完整版 + 精简版）与讲稿
+cd ../report && npm install && node build_report.js  # Word 报告
+cd .. && pytest                         # 单元测试（含术语检查：扫描上面生成的全部产出）
 ```
 
 原始数据已随仓库提供（`data/raw/*.csv.gz`）；需要重新下载时运行 `python scripts/00_download_data.py`，脚本会校验行数与官方一致。
@@ -68,19 +80,21 @@ cd ../report && npm install && node build_report.js  # 生成 Word 报告
 
 ```
 data/raw/          原始数据（gzip）          data/dim/        品类中文维表（人工整理）
-data/external/     外部参考（监管抽检、唯品会品类结构，附出处）
+data/external/     外部参考（附出处）
 sql/               数仓分层 SQL              sql/interview/   面试库建表与 19 道题答案
-scripts/           Python 全流程（00-15）    dashboard/       HTML 看板、BI 导入数据
-docs/              各模块说明文档与指标字典    outputs/         分析结果、图表、数据质量报告
-ppt/               PPT 与生成脚本            report/          Word 报告与生成脚本
+sql/hive/          Hive 分区表与 5 道题      sql/exam/        笔试模拟卷答案
+scripts/           Python 全流程（00-17）    dashboard/       HTML 看板、BI 导入数据
+tests/             单元测试                  docker/          MySQL 初始化脚本
+docs/              术语、各模块说明与指标字典  outputs/         分析结果、图表、数据校验报告
+ppt/               PPT、讲稿与生成脚本        report/          Word 报告与生成脚本
 ```
 
-## 关于打标评估，需要说明的一点
+## 关于标注样本，需要说明的一点
 
-两轮打标评估（140 条分层样本、200 条随机金标准）的逐条判定，都是借助大模型（Claude）阅读葡语原文完成的，不是人工逐条标注。每条样本都附了中文释义和判定结果（见 `outputs/qa/`），可以直接人工抽查。判定结果据实使用，不在任何材料里称作"人工复核"。
+标注样本（200 条随机样本）和规则迭代期的 140 条分层样本，逐条判定都是借助大模型（Claude）阅读葡语原文完成的，不是人工逐条标注。每条样本都附了中文释义和判定结果（见 `outputs/qa/`），可以直接人工抽查。判定结果据实使用，不在任何材料里称作"人工复核"。
 
 ## 数据来源与声明
 
 - 数据：[Olist Brazilian E-Commerce Public Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)（CC BY-NC-SA 4.0），巴西电商平台脱敏真实订单；本仓库使用的是 GitHub 上的 gzip 镜像，行数与官方一致。
-- 外部参考数据（`data/external/`）取自监管公告的新闻转载和财报报道，数字引用前应核对原文。
-- 本项目是个人求职作品，不代表唯品会或 Olist 的任何观点，所用数据与唯品会无关；文中"唯品会品控"的对应关系仅用于说明方法如何迁移。
+- 外部参考数据（`data/external/`）取自公告、新闻转载和财报报道，数字引用前应核对原文。
+- 本项目是个人作品，不代表 Olist 或任何公司的观点。

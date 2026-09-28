@@ -10,7 +10,8 @@ const {
 const { meta, blocks } = require("./report_content");
 
 const ROOT = path.resolve(__dirname, "..");
-const TEAL = "0E6E6E", INK = "17232B", MUTED = "5E6B72", TINT = "E4F0EF", LINE = "D5DADB";
+// 配色：白底 + 玫红 #E1006C + 95 度黑 #161418（与 PPT、看板、图表一致）
+const PINK = "E1006C", INK = "161418", MUTED = "6E6872", TINT = "FCE6F0", LINE = "E9E6EA";
 const FONT = { ascii: "Arial", hAnsi: "Arial", eastAsia: "Microsoft YaHei", cs: "Arial" };
 const CONTENT_W = 9026; // A4 宽 11906 − 左右边距 1440×2
 
@@ -30,7 +31,7 @@ function table(b) {
   widths[widths.length - 1] += CONTENT_W - widths.reduce((a, x) => a + x, 0);
   const cell = (t, i, head, last) => new TableCell({
     width: { size: widths[i], type: WidthType.DXA }, borders,
-    shading: { type: ShadingType.CLEAR, color: "auto", fill: head ? TEAL : (last ? TINT : "FFFFFF") },
+    shading: { type: ShadingType.CLEAR, color: "auto", fill: head ? INK : (last ? TINT : "FFFFFF") },
     margins: { top: 60, bottom: 60, left: 100, right: 100 },
     children: [new Paragraph({ children: [run(t, { bold: head || last, color: head ? "FFFFFF" : INK, size: 19 })] })],
   });
@@ -64,7 +65,7 @@ function callout(items) {
 
 const children = [];
 children.push(new Paragraph({ spacing: { before: 600, after: 120 }, children: [run(meta.title, { bold: true, size: 48, color: INK })] }));
-children.push(new Paragraph({ spacing: { after: 300 }, children: [run(meta.subtitle, { size: 26, color: TEAL })] }));
+children.push(new Paragraph({ spacing: { after: 300 }, children: [run(meta.subtitle, { size: 26, color: PINK })] }));
 meta.info.forEach(([k, v]) => children.push(new Paragraph({
   spacing: { after: 60 }, children: [run(k + "：", { bold: true, size: 19, color: MUTED }), run(v, { size: 19, color: MUTED })],
 })));
@@ -74,6 +75,8 @@ for (const b of blocks) {
   if (b.t === "h1") children.push(new Paragraph({ heading: HeadingLevel.HEADING_1, children: [run(b.text)] }));
   else if (b.t === "h2") children.push(new Paragraph({ heading: HeadingLevel.HEADING_2, children: [run(b.text)] }));
   else if (b.t === "p") children.push(para(b.text));
+  else if (b.t === "kv") children.push(new Paragraph({ spacing: { after: 120, line: 360 },
+    children: [run(b.k + "　", { bold: true, color: PINK }), run(b.text)] }));
   else if (b.t === "bullets") b.items.forEach(t => children.push(new Paragraph({
     numbering: { reference: "bullets", level: 0 }, spacing: { after: 80, line: 340 }, children: [run(t)],
   })));
@@ -95,7 +98,7 @@ const doc = new Document({
     default: { document: { run: { font: FONT, size: 21, color: INK } } },
     paragraphStyles: [
       { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
-        run: { size: 30, bold: true, color: TEAL, font: FONT }, paragraph: { spacing: { before: 360, after: 160 }, outlineLevel: 0 } },
+        run: { size: 30, bold: true, color: PINK, font: FONT }, paragraph: { spacing: { before: 360, after: 160 }, outlineLevel: 0 } },
       { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true,
         run: { size: 24, bold: true, color: INK, font: FONT }, paragraph: { spacing: { before: 240, after: 120 }, outlineLevel: 1 } },
     ],
@@ -104,7 +107,7 @@ const doc = new Document({
     { reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT,
       style: { paragraph: { indent: { left: 440, hanging: 260 } } } }] },
     { reference: "nums", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT,
-      style: { paragraph: { indent: { left: 400, hanging: 300 } }, run: { bold: true, color: TEAL } } }] },
+      style: { paragraph: { indent: { left: 400, hanging: 300 } }, run: { bold: true, color: PINK } } }] },
   ] },
   sections: [{
     properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1300, bottom: 1300, left: 1440, right: 1440 } } },
@@ -128,6 +131,7 @@ for (const b of blocks) {
   if (b.t === "h1") md.push(`## ${b.text}`, "");
   else if (b.t === "h2") md.push(`### ${b.text}`, "");
   else if (b.t === "p") md.push(b.text, "");
+  else if (b.t === "kv") md.push(`**${b.k}**：${b.text}`, "");
   else if (b.t === "bullets") md.push(...b.items.map(t => `- ${t}`), "");
   else if (b.t === "callout") md.push(...b.items.map((t, i) => `${i + 1}. **${t.split("：")[0]}**：${t.split("：").slice(1).join("：")}`), "");
   else if (b.t === "table") md.push(`| ${b.head.join(" | ")} |`, `|${"---|".repeat(b.head.length)}`, ...b.rows.map(r => `| ${r.join(" | ")} |`), "");

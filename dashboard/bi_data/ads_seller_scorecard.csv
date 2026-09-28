@@ -1,4 +1,4 @@
-﻿seller_id,order_cnt,gmv,delivered_cnt,qc_cnt,qc_defect_cnt,qc_mismatch_cnt,qc_missing_cnt,qc_fake_cnt,qc_rate,qc_rate_smooth,bad_rate,ship_overdue_rate,late_rate,avg_score,quality_score,risk_level,score_rank,platform_qc_rate,platform_bad_rate
+﻿seller_id,order_cnt,gmv,delivered_cnt,qc_cnt,qc_defect_cnt,qc_mismatch_cnt,qc_missing_cnt,qc_fake_cnt,qc_rate,qc_rate_smooth,bad_rate,ship_overdue_rate,late_rate,avg_score,quality_score,risk_level,score_rank,benchmark_qc_rate,benchmark_bad_rate
 00ee68308b45bc5e2660cd833c3f81cc,35,5610.00,35,2,0,1,1,0,0.0571,0.05488,0.1143,0.0000,0.0857,4.343,48.2,正常,163,0.0533,0.1396
 01fd077212124329bac32490e8ef80d9,31,1208.00,31,3,1,0,2,0,0.0968,0.06994,0.1613,0.0000,0.0323,4.161,41.6,正常,195,0.0533,0.1396
 01fdefa7697d26ad920e9e0346d4bd1b,44,4372.36,44,2,1,1,0,0,0.0455,0.04963,0.0698,0.0000,0.0909,4.326,56.5,正常,131,0.0533,0.1396

@@ -1,11 +1,11 @@
-﻿order_id,review_score,评价原文（葡语）,中文释义,金标准标签,tag_fake,tag_defect,tag_mismatch,tag_missing,tag_package,判定
+﻿order_id,review_score,评价原文（葡语）,中文释义,标注标签,tag_fake,tag_defect,tag_mismatch,tag_missing,tag_package,判定
 77bebd4675a69e173b4fc0b4cbc38ae4,1,Comprei 3 araras para roupas e foram entregues apenas 2. ,买了 3 个衣架，只送到 2 个,S,0,0,0,0,0,漏标
 86ed94eb351cf5bd2ec4389a2ca92680,3,Boa a rede e chegou rápido,网很好，送得快,,0,0,0,0,0,正确排除
 e838452caf63df94d1fc9a3253734414,1,"RUIM | Não recebemos as notas dos produtos, como isso é possivel, é gravíssimo transporte sem nota fiscal, o cliente fica sem garantias, no site do stark não é possível imprimir, preciso das notas.",没收到商品发票，网站也无法打印,,0,0,0,0,0,正确排除
 a16c048c79d11f82c31fb4fbf407e6cf,1,O teclado não funcionou em meu mac mini. Chegou a localiza-lo porém não consegui emparelhar. Parece que não houve compatibilidade com o mac. ,键盘在 Mac mini 上无法配对，似乎不兼容,M,0,1,0,0,0,命中
 3981ab3fc085c2a1d4dcca88197fe7fd,3,"Recebi o produto no prazo, mas veio faltando uma peça.",按时收到，但少了一个零件,S,0,0,0,1,0,命中
 0d604e02c2216379b914f6ff1aadf8b4,1,Não tenho nada a declarar pq cancelei a compra no dia 13/02/2018 e não recebi nenhuma entrega,已取消订单，没收到任何货,,0,0,0,0,0,正确排除
-5707df1e7d1d8445c2969eec209a9433,1,"Não recebi o produto, se até o dia 28/05 não tiver resposta vou procurar o procom",没收到货，再不回复就去消协投诉,,0,0,0,0,0,正确排除
+5707df1e7d1d8445c2969eec209a9433,1,"Não recebi o produto, se até o dia 28/05 não tiver resposta vou procurar o procom",没收到货，再不回复就去找消费者保护机构,,0,0,0,0,0,正确排除
 2567acdbfc6fa8d47fce09510677b955,1,Até o momento não recebi o produto,至今未收到商品,,0,0,0,0,0,正确排除
 dd3a38574dce5ca54d9475f70832f21c,1,"Não recebi o produto que pedi, comprei 2 luminárias e recebi APENAS 1
 ESTOU SUPER INSATISFEITA 
@@ -49,7 +49,7 @@ e21965e5414f7e165a71649e68030100,1,"Não recebi meu produto , o prazo máximo de
 62ce4e3989a3477928510bb4d1064cc4,1,"Vendedor Sem Compromisso. | Comprei 3 plafons de led, 2 ralos inteligentes e 2 luminarias. Um dos ralos veio quebrado, comprometendo a funcionalidade do mesmo, e as 2 luminárias simplesmente não foram entregues. E ate agora nada",一个地漏坏了，两个灯没送到,DS,0,1,0,0,0,命中
 cb76d29d166fc17f9cedf3416285a80c,1,"O produto veio sem nenhuma proteção, um plástico bolha, um papelão. Veio sem nada e a encomenda veio do Sul do país. Como chegaria ao Rio de Janeiro intacto?????? Impossível. Estou muito desapontada. ",商品没有任何保护包装,P,0,0,0,1,0,命中
 320e6748fc08ae549af6b07874fe6149,3,"O produto esquenta bastante, instruções para instalação em inglês, tive dificuldades na instalação.",发热严重，说明书是英文，安装困难,D,0,0,0,0,0,漏标
-b95ee76467f40a43ca737b18839d83d6,2,"lannister o parceiro fez a entrega do produto, evitando transtornos como ocorrido anteriormente.",商家完成送货（无具体投诉）,,0,0,0,0,0,正确排除
+b95ee76467f40a43ca737b18839d83d6,2,"lannister o parceiro fez a entrega do produto, evitando transtornos como ocorrido anteriormente.",商家完成送货（没有说明具体问题）,,0,0,0,0,0,正确排除
 b49738aaa4978ffb2dd4efeb676c9de4,3,"Gostei do relógio e parece original, porém nao veio e a embalagem nao é a tradicional da casio e também nao veio certificado de garantia.
 Vou entrar em contato com o vendedor e a lannister reclamand",手表像正品，但没有原厂包装和保修卡,S,0,0,0,0,0,漏标
 5fc64d4205c6a465db774fa064e4107d,1,"entrega deficiente, a NT foi emitida em 31 de agosto e até a presente data (18.09.2017) eu não recebi o livro.",发票已开出，书一直没收到,,0,0,0,0,0,正确排除

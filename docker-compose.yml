@@ -1,0 +1,29 @@
+# docker compose up --build：启动 MySQL 8.0，跑单元测试和全流程，生成看板 / PPT / 报告，结果写回本地仓库目录
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: analyst
+      MYSQL_PASSWORD: analyst
+    volumes:
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+
+  app:
+    build: .
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: analyst
+      MYSQL_PASSWORD: analyst
+    volumes:
+      - ./:/app                    # 产出直接写回仓库目录
+      - /app/ppt/node_modules      # 保留镜像里装好的 Node 依赖，不被挂载目录覆盖
+      - /app/report/node_modules

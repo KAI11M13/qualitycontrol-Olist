@@ -12,13 +12,14 @@ from common import OUT_DIR, ROOT, query
 md = importlib.import_module("09_metric_dictionary")
 DASH = ROOT / "dashboard"
 
+# 六条口径规则（与 docs/02_指标体系.md 第 4 节相同）
 RULES = [
-    ("时间归属：按下单月", "所有指标的分子、分母都按下单月归到同一批订单，避免\"本月的客诉来自上月的订单\"。"),
-    ("签收口径", "订单状态为已签收且有签收时间，才进入品质客诉率的分母。"),
-    ("一单一评", "同一订单多次评价时，只保留用户最后一次提交的评价。"),
-    ("品质客诉只认 1-3 星", "4-5 星评价里的\"sem defeito（没有瑕疵）\"等表述不计入，避免关键词误判。"),
-    ("问题类型可多选", "一条评价可能同时命中少件和缺陷，各类型发生率之和大于品质客诉率，不能相加。"),
-    ("比率最后再算", "底表只存计数，筛选后再相除；不对各品类的客诉率求简单平均。"),
+    ("按下单月归属", "一个订单的分子、分母都记在它的下单月，保证分子和分母是同一批订单。"),
+    ("签收订单", "订单状态为已签收且签收时间不为空，才进入品质客诉率的分母。"),
+    ("只取最后一次评价", "同一订单有多条评价时，只使用提交时间最晚的一条。"),
+    ("品质客诉订单只认 1-3 星", "4-5 星评价里的\"sem defeito（没有瑕疵）\"等表述不计入，避免关键词误识别。"),
+    ("一个订单可命中多个标签", "一条评价可能同时命中少件漏发和质量缺陷，5 个结果指标之和大于品质客诉率，不能相加。"),
+    ("比率在最后一步计算", "汇总表只存订单数，筛选后再相除；不对各品类的品质客诉率求简单平均。"),
 ]
 
 
@@ -30,7 +31,7 @@ def main() -> None:
         rows.append([float(v) if hasattr(v, "as_tuple") else v for v in r])     # Decimal → float
 
     sellers = query("SELECT * FROM ads_seller_scorecard")
-    issue_cols = {"qc_defect_cnt": "质量缺陷", "qc_mismatch_cnt": "货不对板", "qc_missing_cnt": "少件/漏发", "qc_fake_cnt": "假货"}
+    issue_cols = {"qc_defect_cnt": "质量缺陷", "qc_mismatch_cnt": "货不对板", "qc_missing_cnt": "少件漏发", "qc_fake_cnt": "假货"}
     recs = []
     for s in sellers.to_dict(orient="records"):
         s = {k: (float(v) if hasattr(v, "as_tuple") else v) for k, v in s.items()}
@@ -40,17 +41,38 @@ def main() -> None:
 
     vals = md.compute_baselines()
     metrics = [{
-        "code": m[0], "name": m[1], "level": m[2], "definition": m[6], "formula": m[7],
-        "baseline": md.fmt_value(v, m[12]) + ("" if v is None or m[12] in ("%",) else f" {m[12]}"),
-        "target": m[14], "available": m[16],
+        "code": m[0], "name": m[1], "level": m[2], "definition": m[5], "formula": m[6],
+        "baseline": md.fmt_value(v, m[md.I_UNIT]) + ("" if v is None or m[md.I_UNIT] == "%" else f" {m[md.I_UNIT]}"),
+        "target": m[md.I_TARGET], "available": m[md.I_AVAIL],
     } for m, v in zip(md.M, vals)]
+
+    # 预警：按评价日期连续 3 天及以上每天都有品质客诉订单的商家（与 SQL 题库 Q15 口径相同）
+    streaks = query("""
+        WITH sd AS (
+            SELECT os.seller_id, q.review_date AS d, COUNT(DISTINCT q.order_id) AS n
+            FROM dwd_qc_order q
+            JOIN dwd_order_seller os ON os.order_id = q.order_id
+            WHERE q.is_delivered = 1 AND q.is_quality_complaint = 1
+            GROUP BY os.seller_id, q.review_date
+        ),
+        g AS (
+            SELECT seller_id, d, n, DATE_SUB(d, INTERVAL ROW_NUMBER() OVER (PARTITION BY seller_id ORDER BY d) DAY) AS grp
+            FROM sd
+        )
+        SELECT seller_id, MIN(d) AS start_day, MAX(d) AS end_day, COUNT(*) AS days, SUM(n) AS qc_orders
+        FROM g
+        GROUP BY seller_id, grp
+        HAVING COUNT(*) >= 3
+        ORDER BY end_day DESC, days DESC""")
+    streak_rows = [[r.seller_id, str(r.start_day), str(r.end_day), int(r.days), int(r.qc_orders)] for r in streaks.itertuples()]
 
     res = json.loads((OUT_DIR / "analysis_results.json").read_text(encoding="utf-8"))
     data = {
-        "meta": {"generated": str(date.today()), "seller_platform_qc_rate": float(sellers.platform_qc_rate.iloc[0]),
+        "meta": {"generated": str(date.today()), "seller_benchmark_qc_rate": float(sellers.benchmark_qc_rate.iloc[0]),
                  "seller_cover": res["seller_eligible_order_cover"]},
         "cube": {"cols": cols, "rows": rows},
         "sellers": recs,
+        "streaks": streak_rows,
         "metrics": metrics,
         "rules": RULES,
     }
@@ -63,7 +85,7 @@ def main() -> None:
              "</head>\n<body>\n" + body + "\n</body>\n</html>\n")
     (DASH / "index.html").write_text(local, encoding="utf-8")
     (OUT_DIR / "dashboard_artifact.html").write_text(body, encoding="utf-8")
-    print(f"  → dashboard/index.html（{len(local) / 1024:.0f} KB，cube {len(rows)} 行，商家 {len(recs)} 家）")
+    print(f"  → dashboard/index.html（{len(local) / 1024:.0f} KB，cube {len(rows)} 行，商家 {len(recs)} 家，商家连续品质客诉预警 {len(streak_rows)} 条）")
 
     # BI 工具导入数据
     bi = DASH / "bi_data"

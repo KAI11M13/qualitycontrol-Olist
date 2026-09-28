@@ -11,7 +11,7 @@
   H2 订单结构：多件 / 多商家订单是否更容易出品质问题？
   H3 商家：品质客诉是否集中在少数商家？
   H4 品类 / 商品：哪些品类高风险？商品信息完整度是否相关？
-  H5 证伪：新商家更差？晚到导致更多损坏？首单客诉影响复购？
+  H5 证伪：新商家更差？晚到导致更多损坏？首单为品质客诉订单影响复购？
   H6 治理测算：三项举措能把品质客诉率降到多少？
 """
 import json
@@ -26,33 +26,9 @@ from matplotlib.ticker import FuncFormatter, PercentFormatter
 
 from common import FIG_DIR, OUT_DIR, query
 
-# ---------------------------------------------------------------- 图表样式
-INK, INK2, MUTED, GRID, AXIS, SURFACE = "#0b0b0b", "#52514e", "#898781", "#e1e0d9", "#c3c2b7", "#fcfcfb"
-BLUE, ORANGE, AQUA, YELLOW, MAGENTA = "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"
-GRAY = "#c3c2b7"
-WARN, CRIT = "#fab219", "#d03b3b"
-
-plt.rcParams.update({
-    "font.family": "Noto Sans CJK SC",
-    "font.size": 11,
-    "axes.edgecolor": AXIS, "axes.linewidth": 0.8,
-    "axes.spines.top": False, "axes.spines.right": False,
-    "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.8, "axes.axisbelow": True,
-    "xtick.color": MUTED, "ytick.color": MUTED, "xtick.labelcolor": INK2, "ytick.labelcolor": INK2,
-    "axes.labelcolor": INK2, "text.color": INK, "axes.titlesize": 12, "axes.titleweight": "bold",
-    "axes.titlelocation": "left", "axes.titlecolor": INK,
-    "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
-    "legend.frameon": False, "legend.fontsize": 10,
-})
-PCT = PercentFormatter(1.0, decimals=0)
-PCT1 = PercentFormatter(1.0, decimals=1)
-
-
-def save(fig, name):
-    FIG_DIR.mkdir(parents=True, exist_ok=True)
-    fig.savefig(FIG_DIR / f"{name}.png", dpi=200, bbox_inches="tight")
-    plt.close(fig)
-    print(f"  图 → outputs/figures/{name}.png")
+# ---------------------------------------------------------------- 图表样式（统一在 viz_style.py）
+from viz_style import (AMBER, AXIS, CRIT, DARK, FAKE, GRAY, INK, INK2, MUTED, PCT, PCT1, PINK, PINK2, QC, SHARE,  # noqa: E402
+                       SURFACE, WARN, month_labels, plt, save)
 
 
 def f(df):
@@ -107,49 +83,52 @@ R["on_time_2018M3"] = float(kpi.set_index("purchase_month").loc["2018-03", "on_t
 
 # 图1：小多图 —— 差评率 / 准时签收率 / 品质客诉率（三个量纲，不用双轴）
 x = np.arange(len(kpi))
-labels = [m[2:].replace("-", ".") for m in kpi.purchase_month]
-fig, axes = plt.subplots(3, 1, figsize=(10, 7.2), sharex=True, gridspec_kw={"hspace": 0.45})
-for ax, col, title, color, fmt in [
-    (axes[0], "bad_rate", "差评率（1-2星 / 已评价订单）", GRAY, PCT),
-    (axes[1], "on_time_rate", "准时签收率（签收日 ≤ 承诺日）", GRAY, PCT),
-    (axes[2], "qc_rate", "品质客诉率（品质客诉单 / 签收单）", BLUE, PCT1),
+labels = month_labels(list(kpi.purchase_month))
+qc2017 = float(query("""SELECT SUM(is_delivered*is_quality_complaint)/SUM(is_delivered) FROM dwd_qc_order
+                        WHERE in_scope = 1 AND purchase_month <= '2017-12'""").iloc[0, 0])
+fig, axes = plt.subplots(3, 1, figsize=(10, 7.4), sharex=True, gridspec_kw={"hspace": 0.5})
+for ax, col, title, color, fmt, lab in [
+    (axes[0], "bad_rate", "差评率（最后一次评价为 1-2 星的订单数 ÷ 有评价的订单数）", GRAY, PCT, SHARE),
+    (axes[1], "on_time_rate", "准时签收率（签收日期不晚于承诺送达日期的签收订单数 ÷ 签收订单数）", GRAY, PCT, SHARE),
+    (axes[2], "qc_rate", "品质客诉率（品质客诉订单数 ÷ 签收订单数）", PINK, PCT1, QC),
 ]:
     y = kpi[col].astype(float).values
-    ax.plot(x, y, color=color if col != "qc_rate" else BLUE, lw=2, solid_capstyle="round")
-    ax.scatter([x[-1]], [y[-1]], s=40, color=color if col != "qc_rate" else BLUE, zorder=3,
+    ax.plot(x, y, color=color if col != "qc_rate" else PINK, lw=2, solid_capstyle="round")
+    ax.scatter([x[-1]], [y[-1]], s=40, color=color if col != "qc_rate" else PINK, zorder=3,
                edgecolor=SURFACE, linewidth=2)
     ax.set_title(title, fontsize=11)
     ax.yaxis.set_major_formatter(fmt)
-    ax.text(x[-1] + 0.3, y[-1], fmt(y[-1]), va="center", fontsize=10, color=INK)
+    ax.text(x[-1] + 0.3, y[-1], lab(y[-1]), va="center", fontsize=10, color=INK)
     ax.set_xlim(-0.5, len(x) - 0.2)
     ax.grid(axis="x", visible=False)
     ax.tick_params(axis="x", length=0)
 for ax in axes[:2]:
     for line in ax.get_lines():
-        line.set_color("#7a7974")
+        line.set_color(MUTED)
     for c in ax.collections:
-        c.set_color("#7a7974")
-axes[0].annotate("物流危机\n差评率 22.8%", xy=(14, kpi.bad_rate.iloc[14]), xytext=(9.6, 0.205),
+        c.set_color(MUTED)
+i3 = list(kpi.purchase_month).index("2018-03")
+axes[0].annotate(f"2018-03：差评率 {SHARE(kpi.bad_rate.iloc[i3])}", xy=(i3, kpi.bad_rate.iloc[i3]), xytext=(8.6, 0.21),
                  fontsize=9, color=INK2, arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.8))
-axes[2].axhline(float(period.qc_rate.iloc[0]), color=AXIS, lw=1)
-axes[2].text(7.5, float(period.qc_rate.iloc[0]) - 0.0012, f"2017H1 均值 {period.qc_rate.iloc[0]:.1%}", fontsize=9,
-             color=MUTED, va="top")
+axes[1].annotate(f"2018-03：准时签收率 {SHARE(kpi.on_time_rate.iloc[i3])}", xy=(i3, kpi.on_time_rate.iloc[i3]),
+                 xytext=(8.2, 0.83), fontsize=9, color=INK2, arrowprops=dict(arrowstyle="-", color=MUTED, lw=0.8))
+axes[2].axhline(qc2017, color=AXIS, lw=1)
+axes[2].text(12.2, qc2017 - 0.0010, f"2017 年品质客诉率 {QC(qc2017)}", fontsize=9, color=MUTED, va="top")
 axes[2].set_xticks(x, labels, fontsize=9)
 save(fig, "fig01_trend_small_multiples")
 
 # 图2：差评原因结构（按季度，100% 堆叠）
 badmix_q = f(query("""
     SELECT CONCAT(YEAR(purchase_ts), 'Q', QUARTER(purchase_ts)) q,
-           SUM(CASE WHEN complaint_group = '品质类' THEN 1 ELSE 0 END) quality,
-           SUM(CASE WHEN complaint_group = '履约类' THEN 1 ELSE 0 END) fulfill,
-           SUM(CASE WHEN complaint_group = '服务类' THEN 1 ELSE 0 END) service,
-           SUM(CASE WHEN complaint_type = '其他差评' THEN 1 ELSE 0 END) other,
-           SUM(CASE WHEN complaint_type = '无文本差评' THEN 1 ELSE 0 END) notext
+           SUM(CASE WHEN complaint_group = '品质问题' THEN 1 ELSE 0 END) quality,
+           SUM(CASE WHEN complaint_group = '履约服务' THEN 1 ELSE 0 END) fulfill,
+           SUM(CASE WHEN complaint_type = '未命中标签差评' THEN 1 ELSE 0 END) other,
+           SUM(CASE WHEN complaint_type = '无文字差评' THEN 1 ELSE 0 END) notext
     FROM dwd_qc_order WHERE in_scope = 1 AND review_score <= 2
     GROUP BY 1 ORDER BY 1"""))
 TABLES["差评原因结构_季度"] = badmix_q
-parts = [("quality", "品质类", BLUE), ("fulfill", "履约类", ORANGE), ("service", "服务类", AQUA),
-         ("other", "有文本·原因不明", YELLOW), ("notext", "无文本", GRAY)]
+parts = [("quality", "主标签为品质问题标签", PINK), ("fulfill", "主标签为履约服务标签", DARK),
+         ("other", "有文字、未命中标签", AMBER), ("notext", "无文字", GRAY)]
 share = badmix_q[[p[0] for p in parts]].div(badmix_q[[p[0] for p in parts]].sum(axis=1), axis=0)
 fig, ax = plt.subplots(figsize=(10, 4.2))
 left = np.zeros(len(share))
@@ -158,14 +137,15 @@ for key, name, color in parts:
     ax.bar(xq, share[key], bottom=left, width=0.55, color=color, label=name, edgecolor=SURFACE, linewidth=2)
     if key == "quality":
         for i, v in enumerate(share[key]):
-            ax.text(i, v / 2, f"{v:.0%}", ha="center", va="center", color="white", fontsize=10, fontweight="bold")
+            ax.text(i, v / 2, SHARE(v), ha="center", va="center", color="white", fontsize=10, fontweight="bold")
     left += share[key].values
 qlabels = list(badmix_q.q)
-qlabels[-1] = qlabels[-1] + "\n(7-8月)"
+qlabels[-1] = qlabels[-1] + "\n（7、8 月）"
 ax.set_xticks(xq, qlabels)
 ax.yaxis.set_major_formatter(PCT)
 ax.set_ylim(0, 1)
-ax.legend(ncol=5, loc="upper left", bbox_to_anchor=(0, 1.13))
+ax.set_title("差评订单按主标签分类（按下单季度；差评 = 最后一次评价为 1-2 星）", fontsize=11, pad=30)
+ax.legend(ncol=4, loc="upper left", bbox_to_anchor=(0, 1.1))
 ax.grid(axis="x", visible=False)
 save(fig, "fig02_bad_review_reason_mix")
 R["bad_quality_share_by_quarter"] = dict(zip(badmix_q.q, share["quality"].round(4)))
@@ -181,7 +161,7 @@ typ = f(query("""
            SUM(is_delivered*qc_package)/SUM(is_delivered)  package,
            SUM(is_delivered*is_quality_complaint)/SUM(is_delivered) qc
     FROM dwd_qc_order WHERE in_scope = 1 GROUP BY 1 ORDER BY 1"""))
-TABLES["品质问题类型_年度"] = typ
+TABLES["结果指标_年度"] = typ
 R["type_by_year"] = typ.set_index("p").drop(columns="d").to_dict(orient="index")
 
 
@@ -200,7 +180,7 @@ def decompose(dim_sql: str):
         "within_effect": float((wA * (rB - rA)).sum()),
         "interaction": float(((wB - wA) * (rB - rA)).sum()),
     }
-    seg = pd.DataFrame({"权重2017": wA, "权重2018": wB, "客诉率2017": rA, "客诉率2018": rB,
+    seg = pd.DataFrame({"权重2017": wA, "权重2018": wB, "品质客诉率2017": rA, "品质客诉率2018": rB,
                         "组内贡献": wA * (rB - rA)}).sort_values("组内贡献", ascending=False)
     return out, seg
 
@@ -211,21 +191,22 @@ TABLES["因素分解_一级类目"] = seg_cat.reset_index()
 TABLES["因素分解_单多件"] = seg_ot.reset_index()
 R["decomp_category_top"] = {k: float(v) for k, v in seg_cat["组内贡献"].head(4).items()}
 
-# 图3：2017 vs 2018 各类品质问题发生率
+# 图3：5 个结果指标，2017 年 vs 2018 年 1-8 月
 fig, ax = plt.subplots(figsize=(10, 4))
-names = [("missing", "少件/漏发"), ("defect", "质量缺陷"), ("mismatch", "货不对板"), ("fake", "假货"), ("package", "包装破损")]
+names = [("missing", "少件漏发客诉率"), ("defect", "质量缺陷客诉率"), ("mismatch", "货不对板客诉率"), ("fake", "假货客诉率"), ("package", "包装破损客诉率")]
 xi = np.arange(len(names))
 a = typ.set_index("p").loc["2017"]
 b = typ.set_index("p").loc["2018M1-8"]
-ax.bar(xi - 0.15, [a[k] for k, _ in names], width=0.28, color=GRAY, label="2017 全年")
-ax.bar(xi + 0.15, [b[k] for k, _ in names], width=0.28, color=BLUE, label="2018 年 1-8 月")
+ax.bar(xi - 0.15, [a[k] for k, _ in names], width=0.28, color=GRAY, label="2017 年")
+ax.bar(xi + 0.15, [b[k] for k, _ in names], width=0.28, color=PINK, label="2018 年 1-8 月")
 for i, (k, _) in enumerate(names):
-    chg = b[k] / a[k] - 1
-    ax.text(i + 0.15, b[k] + 0.0004, f"{b[k]:.2%}\n({chg:+.0%})", ha="center", va="bottom", fontsize=9, color=INK)
-ax.set_xticks(xi, [n for _, n in names])
+    lab = (lambda v: f"{v * 1e4:.1f}") if k == "fake" else QC   # 假货客诉率用"单/万单"
+    ax.text(i - 0.15, a[k] + 0.0004, lab(a[k]), ha="center", va="bottom", fontsize=8.5, color=MUTED)
+    ax.text(i + 0.15, b[k] + 0.0004, lab(b[k]), ha="center", va="bottom", fontsize=8.5, color=INK)
+ax.set_xticks(xi, [n + ("\n（数据标签单位：单/万单）" if k == "fake" else "") for k, n in names])
 ax.yaxis.set_major_formatter(PCT1)
-ax.set_ylim(0, max(max(b[k] for k, _ in names), max(a[k] for k, _ in names)) * 1.35)
-ax.set_title("各类品质问题发生率（占签收单）", fontsize=11)
+ax.set_ylim(0, max(max(b[k] for k, _ in names), max(a[k] for k, _ in names)) * 1.3)
+ax.set_title("5 个结果指标（命中该标签的品质客诉订单数 ÷ 签收订单数）", fontsize=11)
 ax.legend(loc="upper right")
 ax.grid(axis="x", visible=False)
 save(fig, "fig03_type_yoy")
@@ -257,15 +238,16 @@ yi = np.arange(len(ot))[::-1]
 miss = ot.missing.values
 rest = ot.qc.values - ot.missing.values
 rest = np.clip(rest, 0, None)
-ax.barh(yi, miss, height=0.5, color=ORANGE, label="少件/漏发", edgecolor=SURFACE, linewidth=2)
-ax.barh(yi, rest, left=miss, height=0.5, color=BLUE, label="其他品质问题", edgecolor=SURFACE, linewidth=2)
+ax.barh(yi, miss, height=0.5, color=DARK, label="命中少件漏发标签", edgecolor=SURFACE, linewidth=2)
+ax.barh(yi, rest, left=miss, height=0.5, color=PINK, label="未命中少件漏发标签", edgecolor=SURFACE, linewidth=2)
 for i, (q_, n_, s_) in enumerate(zip(ot.qc, ot.n, ot.order_share)):
-    ax.text(q_ + 0.004, yi[i], f"{q_:.1%}   （{int(n_):,} 单，占 {s_:.1%}）", va="center", fontsize=10)
-ax.set_yticks(yi, [t[2:] for t in ot.t])
+    ax.text(q_ + 0.004, yi[i], f"{QC(q_)}   （{int(n_):,} 单，占签收订单 {SHARE(s_)}）", va="center", fontsize=10)
+ax.set_yticks(yi, [{"单件": "单件订单", "同SKU多件": "同 SKU 多件", "单商家多SKU": "单商家多 SKU", "多商家": "多商家"}[t[2:]]
+                   for t in ot.t])
 ax.xaxis.set_major_formatter(PCT)
-ax.set_xlim(0, ot.qc.max() * 1.6)
-ax.set_title("品质客诉率 × 订单结构（签收单）", fontsize=11)
-ax.legend(ncol=2, loc="upper right", bbox_to_anchor=(1, 1.14))
+ax.set_xlim(0, ot.qc.max() * 1.75)
+ax.set_title("品质客诉率 × 订单结构（下单月 2017-01 至 2018-08 的签收订单）", fontsize=11, pad=26)
+ax.legend(ncol=2, loc="upper left", bbox_to_anchor=(0, 1.12))
 ax.grid(axis="y", visible=False)
 save(fig, "fig04_order_structure")
 
@@ -279,14 +261,14 @@ tier_share = tier.div(tier.sum())
 tier["qc_rate"] = tier.qc / tier.delivered
 R["seller_tier"] = tier.to_dict(orient="index")
 R["seller_tier_share"] = tier_share.to_dict(orient="index")
-R["platform_qc_rate_seller_grain"] = float(sc.platform_qc_rate.iloc[0])
+R["seller_benchmark_qc_rate"] = float(sc.benchmark_qc_rate.iloc[0])
 R["seller_eligible"] = int(len(sc))
 R["seller_eligible_order_cover"] = float(query("""
     SELECT (SELECT SUM(delivered_cnt) FROM ads_seller_scorecard) / SUM(delivered_cnt) FROM dws_seller_month
     WHERE purchase_month BETWEEN '2018-03' AND '2018-08'""").iloc[0, 0])
 
 fig, ax = plt.subplots(figsize=(10, 3.4))
-cols = [("sellers", "商家数"), ("delivered", "签收订单"), ("gmv", "GMV"), ("qc", "品质客诉单")]
+cols = [("sellers", "商家数"), ("delivered", "商家签收订单数"), ("qc", "商家品质客诉订单数")]
 tcolors = {"正常": GRAY, "需关注": WARN, "高风险": CRIT}
 yi = np.arange(len(cols))[::-1]
 for j, (c, name) in enumerate(cols):
@@ -294,23 +276,23 @@ for j, (c, name) in enumerate(cols):
     for t in ["正常", "需关注", "高风险"]:
         v = tier_share.loc[t, c]
         ax.barh(yi[j], v, left=left, height=0.52, color=tcolors[t], edgecolor=SURFACE, linewidth=2,
-                label=t if j == 0 else None)
-        if t == "需关注" and v >= 0.045:
-            ax.text(left + v / 2, yi[j], f"{v:.0%}", ha="center", va="center", fontsize=10,
+                label=t + "商家" if j == 0 else None)
+        if t != "高风险":
+            ax.text(left + v / 2, yi[j], SHARE(v), ha="center", va="center", fontsize=10,
                     color=INK, fontweight="bold")
         left += v
-    ax.text(1.015, yi[j], f"高风险 {tier_share.loc['高风险', c]:.0%}", va="center", fontsize=10, color=INK)
+    ax.text(1.015, yi[j], f"高风险商家 {SHARE(tier_share.loc['高风险', c])}", va="center", fontsize=10, color=INK)
 ax.set_yticks(yi, [n for _, n in cols])
 ax.xaxis.set_major_formatter(PCT)
-ax.set_xlim(0, 1.13)
+ax.set_xlim(0, 1.2)
 ax.set_xticks([0, .2, .4, .6, .8, 1])
-ax.set_title(f"商家风险分层（近6个月，签收≥30单的 {len(sc)} 家商家，覆盖 {R['seller_eligible_order_cover']:.0%} 订单）", fontsize=11)
+ax.set_title(f"商家分层：{len(sc)} 家参评商家的构成（商家评估窗口：下单月 2018-03 至 2018-08）", fontsize=11)
 ax.legend(ncol=3, loc="upper left", bbox_to_anchor=(0, -0.12))
 ax.grid(axis="y", visible=False)
 save(fig, "fig05_seller_tier")
 
-# 帕累托：按客诉率从高到低排序商家，累计订单占比 vs 累计客诉占比
-sc_sorted = sc.sort_values("qc_rate_smooth", ascending=False).reset_index(drop=True)
+# 帕累托：按平滑品质客诉率从高到低排序商家，累计商家签收订单占比 vs 累计商家品质客诉订单占比
+sc_sorted = sc.sort_values(["qc_rate_smooth", "seller_id"], ascending=[False, True], kind="mergesort").reset_index(drop=True)   # 同分按商家 ID，结果不随行序变化
 sc_sorted["cum_orders"] = sc_sorted.delivered_cnt.cumsum() / sc_sorted.delivered_cnt.sum()
 sc_sorted["cum_qc"] = sc_sorted.qc_cnt.cumsum() / sc_sorted.qc_cnt.sum()
 k10 = (sc_sorted.cum_orders <= 0.10).sum()
@@ -324,10 +306,10 @@ p_rate = float(R["overview"]["qc_rate"])
 fig, ax = plt.subplots(figsize=(10, 5.2))
 hi = cat.qc_rate >= 1.2 * p_rate
 ax.scatter(cat.delivered_cnt[~hi], cat.qc_rate[~hi], s=46, color=GRAY, edgecolor=SURFACE, linewidth=2, zorder=3)
-ax.scatter(cat.delivered_cnt[hi], cat.qc_rate[hi], s=56, color=ORANGE, edgecolor=SURFACE, linewidth=2, zorder=3)
+ax.scatter(cat.delivered_cnt[hi], cat.qc_rate[hi], s=56, color=DARK, edgecolor=SURFACE, linewidth=2, zorder=3)
 ax.axhline(p_rate, color=AXIS, lw=1)
-ax.text(cat.delivered_cnt.min() * 0.95, p_rate + 0.0012, f"平台均值 {p_rate:.1%}", va="bottom", fontsize=9, color=MUTED)
-# 标注：全部橙色点 + 体量最大的几个品类（偏移量手工调过，避免重叠）
+ax.text(cat.delivered_cnt.min() * 0.95, p_rate + 0.0012, f"全部签收订单 {QC(p_rate)}", va="bottom", fontsize=9, color=MUTED)
+# 标注：全部黑色点 + 体量最大的几个品类（偏移量手工调过，避免重叠）
 offsets = {"办公家具": (8, 0, "left"), "家装建材": (8, 0, "left"), "未知品类": (8, 0, "left"),
            "居家舒适": (0, 11, "center"), "影音设备": (0, -12, "center"), "客厅家具": (8, 2, "left"),
            "家用电器": (8, 0, "left"), "手机通讯": (0, 11, "center"), "家具软装": (-8, -1, "right"),
@@ -335,14 +317,15 @@ offsets = {"办公家具": (8, 0, "left"), "家装建材": (8, 0, "left"), "未�
            "美妆健康": (-8, -11, "right")}
 for _, r_ in cat[cat.category_cn.isin(offsets)].iterrows():
     dx, dy, ha = offsets[r_.category_cn]
-    ax.annotate(f"{r_.category_cn} {r_.qc_rate:.1%}", (r_.delivered_cnt, r_.qc_rate), xytext=(dx, dy),
+    ax.annotate(f"{r_.category_cn} {QC(r_.qc_rate)}", (r_.delivered_cnt, r_.qc_rate), xytext=(dx, dy),
                 textcoords="offset points", fontsize=9, color=INK2, va="center", ha=ha)
 ax.set_xscale("log")
 ax.set_xlim(240, 12500)
 ax.xaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{int(v):,}"))
 ax.yaxis.set_major_formatter(PCT)
-ax.set_xlabel("签收订单数（对数轴）")
-ax.set_title("品类体量 × 品质客诉率（签收≥300单的品类；橙色 = 高于平台 1.2 倍）", fontsize=11)
+ax.set_xlabel("主品类的签收订单数（对数轴）")
+ax.set_title("品类体量 × 品质客诉率（下单月 2017-01 至 2018-08，签收订单 ≥ 300 的主品类；\n"
+             "黑点 = 品质客诉率 ≥ 全部签收订单的 1.2 倍）", fontsize=11)
 save(fig, "fig06_category_scatter")
 R["category_top"] = cat.sort_values("qc_rate", ascending=False).head(6)[
     ["category_cn", "delivered_cnt", "qc_rate", "defect_rate", "mismatch_rate", "missing_rate", "qc_share"]
@@ -373,7 +356,7 @@ fake_cat = f(query("""
     SELECT main_category_cn, COUNT(*) n, SUM(qc_fake) fake, AVG(qc_fake) fake_rate
     FROM dwd_qc_order WHERE in_scope = 1 AND is_delivered = 1
     GROUP BY 1 HAVING n >= 300 ORDER BY fake_rate DESC LIMIT 6"""))
-TABLES["假货投诉_品类TOP"] = fake_cat
+TABLES["假货客诉率_品类TOP"] = fake_cat
 R["fake_top"] = fake_cat.to_dict(orient="records")
 R["fake_platform"] = float(query("SELECT AVG(qc_fake) FROM dwd_qc_order WHERE in_scope=1 AND is_delivered=1").iloc[0, 0])
 
@@ -399,7 +382,7 @@ repurchase = f(query("""
                ROW_NUMBER() OVER (PARTITION BY customer_unique_id ORDER BY purchase_ts) rn,
                COUNT(*)     OVER (PARTITION BY customer_unique_id) n_orders
         FROM dwd_qc_order WHERE in_scope = 1)
-    SELECT CASE WHEN is_quality_complaint = 1 THEN '1 首单品质客诉' WHEN is_bad = 1 THEN '2 首单其他差评'
+    SELECT CASE WHEN is_quality_complaint = 1 THEN '1 首单品质客诉' WHEN is_bad = 1 THEN '2 首单差评（非品质）'
                 WHEN review_score = 5 THEN '4 首单5星' ELSE '3 首单3-4星' END g,
            COUNT(*) customers, AVG(n_orders > 1) repurchase_rate
     FROM c WHERE rn = 1 AND is_delivered = 1 AND has_review = 1 AND purchase_ts < '2018-03-01'
@@ -414,7 +397,7 @@ R["falsify"] = {
 }
 
 # ================================================================ H6 治理测算
-# 以 2018 年 1-8 月签收订单为基线，每个品质客诉单按其命中的举措计算"被避免的概率"，
+# 以 2018 年 1-8 月签收订单为基期，每个品质客诉订单按其命中的举措计算"被避免的概率"，
 # 多个举措叠加时 p = 1 - Π(1 - p_i)，避免重复计算。
 base = f(query("""
     SELECT q.order_id, q.item_cnt, q.qc_missing, q.qc_fake, q.qc_mismatch, q.main_category_l1,
@@ -424,12 +407,12 @@ base = f(query("""
 N = len(base)
 qc = base[base.is_quality_complaint == 1].copy()
 ACTIONS = [
-    ("A", "多件订单出库复核 + 分包裹提醒", "多件订单的少件/漏发客诉减少 50%",
+    ("A", "多件订单出库复核 + 分包裹提醒", "多件订单中命中少件漏发标签的品质客诉订单减少 50%",
      lambda d: ((d.item_cnt > 1) & (d.qc_missing == 1)) * 0.5),
-    ("B", "高风险/需关注商家整改", "该类商家的品质客诉减少 30%",
+    ("B", "高风险商家和需关注商家整改", "主商家为高风险商家或需关注商家的品质客诉订单减少 30%",
      lambda d: d.risk_level.isin(["高风险", "需关注"]) * 0.3),
-    ("C", "3C数码/钟表礼品 正品与描述专项", "两类目假货 + 货不对板客诉减少 30%",
-     lambda d: (d.main_category_l1.isin(["3C数码", "钟表礼品"]) & ((d.qc_fake == 1) | (d.qc_mismatch == 1))) * 0.3),
+    ("C", "3C数码、钟表与潮流好物正品与商品描述专项", "主品类属于一级类目 3C数码、钟表与潮流好物且命中假货或货不对板标签的品质客诉订单减少 30%",
+     lambda d: (d.main_category_l1.isin(["3C数码", "钟表与潮流好物"]) & ((d.qc_fake == 1) | (d.qc_mismatch == 1))) * 0.3),
 ]
 survive = np.ones(len(qc))
 steps = []
@@ -445,20 +428,20 @@ TABLES["治理测算"] = pd.DataFrame(steps)
 
 fig, ax = plt.subplots(figsize=(10, 4))
 xs = np.arange(len(steps) + 2)
-ax.bar(0, rate0, width=0.5, color=BLUE)
-ax.text(0, rate0 + 0.0008, f"{rate0:.2%}", ha="center", fontsize=10)
+ax.bar(0, rate0, width=0.5, color=PINK)
+ax.text(0, rate0 + 0.0008, QC(rate0), ha="center", fontsize=10)
 level = rate0
 for i, s in enumerate(steps, start=1):
-    ax.bar(i, s["delta_pp"], bottom=level - s["delta_pp"], width=0.5, color=AQUA)
+    ax.bar(i, s["delta_pp"], bottom=level - s["delta_pp"], width=0.5, color=PINK2)
     ax.text(i, level + 0.0008, f"−{s['delta_pp'] * 100:.2f}pp", ha="center", fontsize=10)
     level -= s["delta_pp"]
-ax.bar(len(steps) + 1, level, width=0.5, color=BLUE)
-ax.text(len(steps) + 1, level + 0.0008, f"{level:.2%}", ha="center", fontsize=10, fontweight="bold")
-short = {"A": "A 多件订单\n出库复核", "B": "B 高风险商家\n整改", "C": "C 3C/钟表\n正品专项"}
-ax.set_xticks(xs, ["2018年1-8月\n现状"] + [short[s["code"]] for s in steps] + ["治理后\n预期"], fontsize=10)
+ax.bar(len(steps) + 1, level, width=0.5, color=PINK)
+ax.text(len(steps) + 1, level + 0.0008, QC(level), ha="center", fontsize=10, fontweight="bold")
+short = {"A": "举措 A\n多件订单\n出库复核", "B": "举措 B\n高风险商家、\n需关注商家整改", "C": "举措 C\n3C数码、钟表与潮流好物\n正品与商品描述专项"}
+ax.set_xticks(xs, ["基期\n2018 年 1-8 月"] + [short[s["code"]] for s in steps] + ["中性情景\n治理后"], fontsize=9.5)
 ax.yaxis.set_major_formatter(PCT1)
 ax.set_ylim(0, rate0 * 1.2)
-ax.set_title("品质客诉率治理测算（签收口径）", fontsize=11)
+ax.set_title("治理测算：中性情景下的品质客诉率（举措 A 降幅 50%、B 30%、C 30%）", fontsize=11)
 ax.grid(axis="x", visible=False)
 save(fig, "fig07_sizing_waterfall")
 

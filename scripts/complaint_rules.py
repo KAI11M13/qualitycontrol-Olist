@@ -1,24 +1,26 @@
-"""评价文本 → 客诉问题类型 的打标规则（葡语关键词正则）。
+"""评价文字 → 标签 的识别规则（葡语关键词正则）。
+
+标签分两组（docs/00_术语与口径.md 4.2 节）：品质问题标签 5 类、履约服务标签 3 类。
 
 设计原则
 1. 先归一化：小写 + 去重音（não→nao）+ 压缩空白，规避拼写变体。
-2. 多标签：一条评价可同时命中多个问题类型（flag 各自独立）。
-3. 主标签：按 priority 从小到大取第一个命中的类型，用于"客诉结构"类互斥统计。
-   品质类排在履约类前面 —— 用户既说"晚到"又说"坏了"，品控口径先认"坏了"。
-4. 品质客诉只认 1-3 星评价（4-5 星里的"sem defeito/没有瑕疵"等否定表述易误判），
+2. 多标签：一条评价可同时命中多个标签（flag 各自独立）。
+3. 主标签：按 priority 从小到大取第一个命中的标签，用于需要互斥的结构统计。
+   品质问题标签排在履约服务标签前面 —— 用户既说"晚到"又说"坏了"，品控口径先认"坏了"。
+4. 品质客诉订单只认 1-3 星评价（4-5 星里的"sem defeito/没有瑕疵"等否定表述易误判），
    该过滤在 SQL 宽表层（04_dwd_qc_wide.sql）实现。
-5. 规则需要持续迭代：每次调整后抽样复核准确率与召回率（见 docs/01_数据说明与清洗规则.md、scripts/14_tag_gold_eval.py）。
+5. 规则需要持续迭代：每次调整后用标注样本复核标签精确率与标签召回率（见 docs/01_数据说明与清洗规则.md、scripts/14_tag_gold_eval.py）。
 """
 import re
 import unicodedata
 
-# (tag_code, 中文名, 分组, priority, 正则)
+# (tag_code, 标签名, 标签分组, priority, 正则)
 RULES = [
-    ("fake", "假货/非正品", "品质类", 1,
+    ("fake", "假货", "品质问题", 1,
      r"falsificad|nao (e|eh|era|sao|parece) (um |uma )?(produto )?original|nao original|nao e legitim"
      r"|replica|pirata|\bcopia\b(?! d[ao] (nota|nf))|nao e da marca|produto paralelo"),
 
-    ("defect", "质量缺陷/功能故障", "品质类", 2,
+    ("defect", "质量缺陷", "品质问题", 2,
      # 外观/物理损坏
      r"defeit|quebrad|quebrou|danificad|avariad|estragad|rasgad|trincad|rachad|riscad|amassad|furad[oa]s?\b"
      r"|manchad|descascou|descascando|enferruj|mofad|vazand|vazou|desfiou|desfiando|entortad|marca de queda"
@@ -35,7 +37,7 @@ RULES = [
      r"|validade vencid|produto vencid|fora da validade|prazo de validade (vencid|curt|proxim)"
      r"|validade (para vencimento|curta|proxima)|perto de vencer|proximo do vencimento"),
 
-    ("mismatch", "货不对板/错发", "品质类", 3,
+    ("mismatch", "货不对板", "品质问题", 3,
      r"diferente d[aoe]s? (foto|imagem|anuncio|anunciad|pedid|descri|site|original|que (comprei|pedi|foi|esta|estava|mostra|eu))"
      r"|(veio|chegou|recebi|entregue|enviad[oa]|mandaram|e|era|produto|cor|modelo|tamanho|totalmente|completamente"
      r"|bem|muito|um|uma|outro|outra) diferente"
@@ -47,7 +49,7 @@ RULES = [
      r"|muito pequen|muito grande|tamanho (errado|incorreto|menor|maior)|nao e compativel|incompativel|nao serve"
      r"|propaganda enganosa|anuncio enganoso|enganos|nao (e|esta|veio|chegou) conforme|nao e (igual|como) (a|na) foto"),
 
-    ("missing", "少件/漏发/缺配件", "品质类", 4,
+    ("missing", "少件漏发", "品质问题", 4,
      r"faltand|faltou(?! (clareza|informac|atencao|respeito|comunicac|cuidado|educacao|compromisso|profissionalismo|so\b))"
      r"|falta (de )?(uma|um|a|o|as|os|peca|pecas|item|itens|parte|acessorio|produto)\b"
      r"|so (recebi|veio|chegou|chegaram|entregaram) (um|uma|1|metade|parte)"
@@ -59,11 +61,11 @@ RULES = [
      r"|(o|a) (outr[oa]|segund[oa])( \w+)? (nao|ainda nao) (veio|chegou)|nao recebi (o|a) (outr[oa]|segund[oa]|restante)"
      r"|nada d[oa] (outr[oa]|segund[oa])\b"),
 
-    ("package", "包装破损/简陋", "品质类", 5,
+    ("package", "包装破损", "品质问题", 5,
      r"(embalagem|caixa|pacote)( \w+){0,3} (violad|danificad|rasgad|aberta|amassad|molhad|detonad|estourad)"
      r"|embalagem (ruim|pessima|horrivel|precaria|fraca|simples)|mal embalad|pessimamente embalad|sem embalagem"),
 
-    ("not_received", "未收到货", "履约类", 6,
+    ("not_received", "未收到货", "履约服务", 6,
      r"nao (recebi|recebemos|chegou|chegaram|foi entregue|foram entregues|entregaram|entregou"
      r"|veio\b(?! (quebrad|danificad|amassad|riscad|com |errad|faltand|diferente|do jeito|conforme|como)))"
      r"|ainda nao (recebi|chegou)|nunca (chegou|recebi)|nao (me )?entreg|nao me foi entregue|nao foi recebid|nao recebido"
@@ -71,10 +73,10 @@ RULES = [
      r"|(ainda aguardo|continuo aguardando|estou aguardando) (o |a |meu |minha )?(produto|pedido|entrega|mercadoria|chegada)"
      r"|nada de chegar|ate (agora|hoje|o momento) nada|sem previsao|\bcade\b|extraviad|devolvid[oa] ao remetente|sem receber"),
 
-    ("delay", "物流延迟", "履约类", 7,
+    ("delay", "物流延迟", "履约服务", 7,
      r"atras|demor|prazo|lent[oa]\b|muito tempo|chegou tarde|entrega tardia"),
 
-    ("service", "服务/售后响应", "服务类", 8,
+    ("service", "服务售后", "履约服务", 8,
      r"atendimento|nao respond|sem resposta|nenhuma resposta|nao (tive|obtive|recebi) (retorno|resposta)"
      r"|sem retorno|nenhum retorno|nao consigo (falar|contato|contatar|resolver)|contato|\bsac\b"
      r"|reclame aqui|procon|reembols|estorno|dinheiro de volta|devolu|troca|cancel"),
@@ -97,7 +99,7 @@ _PACKAGE_DAMAGE = re.compile(
 )
 
 _COMPILED = [(code, re.compile(pat)) for code, _, _, _, pat in RULES]
-QUALITY_TAGS = [code for code, _, grp, _, _ in RULES if grp == "品质类"]
+QUALITY_TAGS = [code for code, _, grp, _, _ in RULES if grp == "品质问题"]
 TAG_NAME = {code: name for code, name, _, _, _ in RULES}
 
 

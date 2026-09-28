@@ -45,7 +45,7 @@ def main() -> None:
             assert n == len(df), f"{table} 行数不一致: 源 {len(df)} vs 表 {n}"
             print(f"  {table:<28} {n:>8,} 行  (源文件 {len(df):,} 行, 对账通过)")
 
-        # 维表：品类中文名 + 一级类目（人工整理，映射唯品会类目口径）
+        # 维表：品类中文名 + 一级类目（人工整理：73 个品类归并为 13 个一级类目）
         with conn.cursor() as cur:
             cur.execute("DROP TABLE IF EXISTS dim_category")
             cur.execute(

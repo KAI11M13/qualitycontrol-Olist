@@ -17,7 +17,7 @@ SQL_DIR = ROOT / "sql"
 OUT_DIR = ROOT / "outputs"
 FIG_DIR = OUT_DIR / "figures"
 
-DB = os.getenv("MYSQL_DB", "vip_qc")
+DB = os.getenv("MYSQL_DB", "qc_dw")
 
 
 def connect(db: str | None = DB) -> pymysql.connections.Connection:
