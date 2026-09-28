@@ -22,7 +22,7 @@
 | ① 指标体系 | 31 个指标（核心指标、结果指标、体验指标、过程指标四层）、六条口径规则、口径变更记录；基准值由口径 SQL 实际运行得到 | [指标体系说明](docs/02_指标体系.md) · [指标字典.xlsx](docs/品控指标字典.xlsx) |
 | ② 经营看板 | 3 页交互看板（经营总览 / 商家分层 / 指标口径）：第一屏有控制图和预警清单；Power BI、Tableau、SmartBI 搭建指南；Tableau Public 逐步搭建清单 | [dashboard/index.html](dashboard/index.html)（本地双击打开）· [搭建指南](docs/04_BI看板设计与搭建指南.md) · [Tableau Public 清单](docs/07_Tableau_Public搭建清单.md) · [BI 导入数据](dashboard/bi_data/) |
 | Excel 报表 | 商家品质月报模板：改参数页的月份和阈值，SUMIFS / INDEX-MATCH 公式自动重算商家分层，附数据透视表和条件格式；商家分层结果与数仓逐一核对 | [商家品质月报模板.xlsx](docs/商家品质月报模板.xlsx) |
-| ③ 专题分析 | 分析报告（Word + Markdown）、25 页完整版 PPT（21 页正文 + 4 页附录）与 6 页精简版；控制图、显著性检验、商家分层回测、三组情景、差异化抽检、品类结构重加权 | [报告.docx](report/品控专题分析报告.docx) · [报告.md](docs/03_专题分析报告.md) · [完整版 PPT](ppt/品控数据分析项目_面试汇报.pptx) · [精简版 PPT](ppt/品控数据分析项目_面试汇报_精简版.pptx) · [分析明细](outputs/advanced_tables.xlsx) |
+| ③ 专题分析 | 分析报告（Word + Markdown）、25 页完整版 PPT（21 页正文 + 4 页附录）与 6 页精简版；控制图、显著性检验、商家分层回测、三组情景、差异化抽检、品类结构重加权 | [报告.docx](report/品控专题分析报告.docx) · [报告.md](docs/03_专题分析报告.md) · [完整版 PPT](ppt/Olist品控数据分析项目.pptx) · [分析明细](outputs/advanced_tables.xlsx) |
 | 外部参考 | 市场监管总局抽查结果、穿戴类 GMV 占比（来自公告、新闻转载与财报报道，附出处） | [data/external/](data/external/) |
 | 工程化 | 单元测试（标签规则、标注样本回归、统计检验、Hive 对账、术语检查）；GitHub Actions 每次推送在干净环境里从原始数据重跑全流程；Docker 一键复现 | [tests/](tests/) · [CI 配置](.github/workflows/ci.yml) · [Dockerfile](Dockerfile) |
 
